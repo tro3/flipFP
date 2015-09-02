@@ -1,0 +1,2 @@
+# flipFP
+Functional programming utilities
