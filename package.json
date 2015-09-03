@@ -1,0 +1,27 @@
+{
+  "name": "flip-fp",
+  "version": "1.0.0",
+  "description": "Functional programming utilities",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tro3/flipFP.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tro3/flipFP/issues"
+  },
+  "homepage": "https://github.com/tro3/flipFP#readme",
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "docco": "^0.7.0",
+    "mocha": "^2.3.0"
+  }
+}

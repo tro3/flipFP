@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>flipFP.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>flipFP.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+x = <span class="hljs-built_in">module</span>.exports
+p = <span class="hljs-built_in">console</span>.log</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p><strong>id</strong> =&gt; | a -&gt; a</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.id = id = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> a</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p><strong>keys</strong> =&gt; | {} -&gt; [String]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.keys = keys = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> Object.keys a</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><strong>map</strong> =&gt; (a -&gt; a) -&gt; | [a] -&gt; [a]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.map = map = <span class="hljs-function"><span class="hljs-params">(fcn)</span> -&gt;</span>
+  (lst) -&gt;
+    result = []
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
+      result.push fcn(item)
+    result</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>mapObj</strong> =&gt; (a -&gt; a) -&gt; | {} -&gt; {}</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.mapObj = mapObj = <span class="hljs-function"><span class="hljs-params">(fcn)</span> -&gt;</span>
+  (obj) -&gt;
+    result = {}
+    <span class="hljs-keyword">for</span> key, item <span class="hljs-keyword">of</span> obj
+      result[key] = fcn(item)
+    result</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><strong>pipe</strong> =&gt; [(a -&gt; a)] -&gt; | a -&gt; a</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.pipe = pipe = <span class="hljs-function">-&gt;</span>
+  fcns = []
+  <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> arguments
+    fcns.push item
+  (val) -&gt;
+    <span class="hljs-keyword">for</span> fcn <span class="hljs-keyword">in</span> fcns
+      val = fcn(val)
+    val</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p><strong>traverseObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {}) -&gt; | {} -&gt; {}</p>
+<p>The first object function is executed before descending, the second operates
+on the object resulting after descending</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.traverseObj = traverseObj = <span class="hljs-function"><span class="hljs-params">(valFcn, preFcn, postFcn)</span> -&gt;</span><span class="hljs-function">
+  <span class="hljs-title">loopFn</span> = <span class="hljs-params">(val)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> val <span class="hljs-keyword">instanceof</span> Array <span class="hljs-keyword">then</span> loopOverList val
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> val == <span class="hljs-string">'object'</span> <span class="hljs-keyword">then</span> processObj val
+    <span class="hljs-keyword">else</span> valFcn val
+
+  loopOverObj = mapObj loopFn
+  loopOverList = map loopFn
+  
+  processObj = pipe(
+    preFcn
+    loopOverObj
+    postFcn
+  )</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
