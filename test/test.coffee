@@ -46,12 +46,54 @@ describe 'anyPass', ->
     assert.isFalse test 8    
 
 
+describe 'chain', ->
+  it 'handles basic case', ->
+    testFn = fp.chain (x) -> [x,x]
+    assert.deepEqual testFn([1,2]), [1,1,2,2]
+
+
 describe 'clone', ->
   it 'handles basic case', ->
     val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
     assert.deepEqual fp.clone(val), val
     assert.isFalse fp.clone(val) == val
 
+
+describe 'compose', ->
+  it 'handles basic case', ->
+    fn1 = (x) -> x+2
+    fn2 = (x) -> x/2
+    fn = fp.map (fp.compose fn2, fn1)
+    assert.deepEqual (fn [2,4,6]), [2,3,4]
+
+  it 'handles mutiple args of first function', ->
+    fn1 = (x, y) -> x+2 + y
+    fn2 = (x) -> x/2
+    fn = fp.compose fn2, fn1
+    assert.deepEqual fn(3, 1), 3
+
+
+describe 'composeP', ->
+  class mockPromise
+    constructor: (cb) ->
+      @thenCB = null
+      setTimeout 1, -> cb(@resolve)
+    resolve: (val) ->
+      @thenCB(val)
+    then: (cb) ->
+      @thenCB = cb
+      
+  promise = (cb) ->
+    new mockPromise(cb)
+
+  it 'handles basic case', ->
+    fn1 = (x, y) ->  promise((resolve) -> resolve x+2+y)
+    fn2 = (x) ->  promise((resolve) -> resolve x/2)
+    fn3 = (x) ->  promise((resolve) -> resolve x+1)
+    testFn = fp.pipeP fn3, fn2, fn1
+    testFn(3,1).then (val) ->      
+      assert.deepEqual val, 4
+      
 
 describe 'keys', ->
   it 'handles handles basic case', ->
@@ -81,6 +123,16 @@ describe 'mapObj', ->
     assert.deepEqual (fn {a:1, b:1}), {a:2, b:2}
 
 
+describe 'reduce', ->
+  it 'handles basic case', ->
+    testFn = fp.reduce ((acc, val) -> acc+val), 0
+    assert.equal testFn([1,2,3]), 6
+
+  it 'handles variable init case', ->
+    testFn = fp.reduce ((acc, val) -> acc+val)
+    assert.equal testFn(1, [1,2,3]), 7
+
+
 describe 'pipe', ->
   it 'handles basic case', ->
     fn1 = (x) -> x+2
@@ -93,6 +145,28 @@ describe 'pipe', ->
     fn2 = (x) -> x/2
     fn = fp.pipe fn1, fn2
     assert.deepEqual fn(3, 1), 3
+
+
+describe 'pipeP', ->
+  class mockPromise
+    constructor: (cb) ->
+      @thenCB = null
+      setTimeout 1, -> cb(@resolve)
+    resolve: (val) ->
+      @thenCB(val)
+    then: (cb) ->
+      @thenCB = cb
+      
+  promise = (cb) ->
+    new mockPromise(cb)
+
+  it 'handles basic case', ->
+    fn1 = (x, y) ->  promise((resolve) -> resolve x+2+y)
+    fn2 = (x) ->  promise((resolve) -> resolve x/2)
+    fn3 = (x) ->  promise((resolve) -> resolve x+1)
+    testFn = fp.pipeP fn1, fn2, fn3
+    testFn(3,1).then (val) ->      
+      assert.deepEqual val, 4
 
 
 describe 'traverseObj', ->
