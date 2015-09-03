@@ -23,6 +23,33 @@ x.allPass = allPass = (lst) ->
       return false if !(fcn val)
     true
 
+
+#
+#**always** => a -> (* -> a)
+#
+x.always = always = (val) ->
+  () -> val
+
+
+#
+#**any** => (a -> Boolean) -> ([a] -> Boolean)
+#
+x.any = any = (fn) ->
+  (lst) ->
+    for item in lst
+      return true if (fn item)
+    false
+
+
+#
+#**anyPass** => [(a -> Boolean)] -> (a -> Boolean)
+#
+x.anyPass = anyPass = (lst) ->
+  (val) ->
+    for fcn in lst
+      return true if (fcn val)
+    false
+  
   
 #
 #**clone** => {} -> {}
@@ -72,8 +99,9 @@ x.pipe = pipe = ->
   fcns = []
   for item in arguments
     fcns.push item
-  (val) ->
-    for fcn in fcns
+  () ->
+    val = fcns[0].apply(0, arguments)
+    for fcn in fcns[1..]
       val = fcn(val)
     val
     

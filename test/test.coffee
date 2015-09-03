@@ -22,6 +22,30 @@ describe 'allPass', ->
     assert.isFalse test 12
 
 
+describe 'always', ->
+  it 'handles basic cases', ->
+    test = fp.always 1
+    assert.equal (test 6), 1
+
+
+describe 'any', ->
+  it 'handles basic cases', ->
+    gt5 = fp.any (x) -> x > 5
+    assert.isTrue gt5 [1,3,7,3]
+    assert.isFalse gt5 [2,3,1,4]
+
+
+describe 'anyPass', ->
+  it 'handles basic cases', ->
+    test = fp.anyPass [
+      (x) -> x > 10
+      (x) -> x < 5
+    ]
+    assert.isTrue test 3
+    assert.isTrue test 12
+    assert.isFalse test 8    
+
+
 describe 'clone', ->
   it 'handles basic case', ->
     val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
@@ -63,6 +87,12 @@ describe 'pipe', ->
     fn2 = (x) -> x/2
     fn = fp.map (fp.pipe fn1, fn2)
     assert.deepEqual (fn [2,4,6]), [2,3,4]
+
+  it 'handles mutiple args of first function', ->
+    fn1 = (x, y) -> x+2 + y
+    fn2 = (x) -> x/2
+    fn = fp.pipe fn1, fn2
+    assert.deepEqual fn(3, 1), 3
 
 
 describe 'traverseObj', ->
