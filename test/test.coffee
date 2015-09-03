@@ -4,6 +4,24 @@ p = console.log
 fp = require '../src/flipFP'
 
 
+describe 'all', ->
+  it 'handles basic cases', ->
+    gt5 = fp.all (x) -> x > 5
+    assert.isTrue gt5 [6,7,8,9]
+    assert.isFalse gt5 [6,7,1,9]
+
+
+describe 'allPass', ->
+  it 'handles basic cases', ->
+    test = fp.allPass [
+      (x) -> x > 5
+      (x) -> x < 10
+    ]
+    assert.isTrue test 6
+    assert.isFalse test 1
+    assert.isFalse test 12
+
+
 describe 'clone', ->
   it 'handles basic case', ->
     val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}

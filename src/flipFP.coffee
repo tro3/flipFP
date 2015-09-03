@@ -6,6 +6,25 @@ defers = []
 
 
 #
+#**all** => (a -> Boolean) -> ([a] -> Boolean)
+#
+x.all = all = (fn) ->
+  (lst) ->
+    for item in lst
+      return false if !(fn item)
+    true
+
+#
+#**allPass** => [(a -> Boolean)] -> (a -> Boolean)
+#
+x.allPass = allPass = (lst) ->
+  (val) ->
+    for fcn in lst
+      return false if !(fcn val)
+    true
+
+  
+#
 #**clone** => {} -> {}
 #
 defers.push ->

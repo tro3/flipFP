@@ -45,12 +45,15 @@ defers = []</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p><strong>clone</strong> =&gt; {} -&gt; {}</p>
+              <p><strong>all</strong> =&gt; (a -&gt; Boolean) -&gt; ([a] -&gt; Boolean)</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>defers.push -&gt;
-  x.clone = clone = traverseObj id,id,id</pre></div></div>
+            <div class="content"><div class='highlight'><pre>x.all = all = <span class="hljs-function"><span class="hljs-params">(fn)</span> -&gt;</span>
+  (lst) -&gt;
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> !(fn item)
+    <span class="hljs-literal">true</span></pre></div></div>
             
         </li>
         
@@ -61,11 +64,15 @@ defers = []</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p><strong>id</strong> =&gt; a -&gt; a</p>
+              <p><strong>allPass</strong> =&gt; [(a -&gt; Boolean)] -&gt; (a -&gt; Boolean)</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>x.id = id = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> a</pre></div></div>
+            <div class="content"><div class='highlight'><pre>x.allPass = allPass = <span class="hljs-function"><span class="hljs-params">(lst)</span> -&gt;</span>
+  (val) -&gt;
+    <span class="hljs-keyword">for</span> fcn <span class="hljs-keyword">in</span> lst
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> !(fcn val)
+    <span class="hljs-literal">true</span></pre></div></div>
             
         </li>
         
@@ -76,11 +83,12 @@ defers = []</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p><strong>keys</strong> =&gt; ({} -&gt; [String])</p>
+              <p><strong>clone</strong> =&gt; {} -&gt; {}</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>x.keys = keys = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> Object.keys a</pre></div></div>
+            <div class="content"><div class='highlight'><pre>defers.push -&gt;
+  x.clone = clone = traverseObj id,id,id</pre></div></div>
             
         </li>
         
@@ -90,6 +98,36 @@ defers = []</pre></div></div>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>id</strong> =&gt; a -&gt; a</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.id = id = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> a</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><strong>keys</strong> =&gt; ({} -&gt; [String])</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.keys = keys = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> Object.keys a</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p><strong>map</strong> =&gt; (a -&gt; a) -&gt; ([a] -&gt; [a])</p>
 
@@ -105,11 +143,11 @@ defers = []</pre></div></div>
         </li>
         
         
-        <li id="section-6">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p><strong>mapObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {})</p>
 
@@ -125,11 +163,11 @@ defers = []</pre></div></div>
         </li>
         
         
-        <li id="section-7">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p><strong>pipe</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; a)</p>
 
@@ -147,11 +185,11 @@ defers = []</pre></div></div>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p><strong>traverseObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {})</p>
 <p>The first object function is executed before descending, the second operates
