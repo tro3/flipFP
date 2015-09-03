@@ -32,7 +32,9 @@
             
             <div class="content"><div class='highlight'><pre>
 x = <span class="hljs-built_in">module</span>.exports
-p = <span class="hljs-built_in">console</span>.log</pre></div></div>
+p = <span class="hljs-built_in">console</span>.log
+
+defers = []</pre></div></div>
             
         </li>
         
@@ -43,11 +45,12 @@ p = <span class="hljs-built_in">console</span>.log</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p><strong>id</strong> =&gt; | a -&gt; a</p>
+              <p><strong>clone</strong> =&gt; {} -&gt; {}</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>x.id = id = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> a</pre></div></div>
+            <div class="content"><div class='highlight'><pre>defers.push -&gt;
+  x.clone = clone = traverseObj id,id,id</pre></div></div>
             
         </li>
         
@@ -58,11 +61,11 @@ p = <span class="hljs-built_in">console</span>.log</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p><strong>keys</strong> =&gt; | {} -&gt; [String]</p>
+              <p><strong>id</strong> =&gt; a -&gt; a</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>x.keys = keys = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> Object.keys a</pre></div></div>
+            <div class="content"><div class='highlight'><pre>x.id = id = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> a</pre></div></div>
             
         </li>
         
@@ -73,7 +76,22 @@ p = <span class="hljs-built_in">console</span>.log</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p><strong>map</strong> =&gt; (a -&gt; a) -&gt; | [a] -&gt; [a]</p>
+              <p><strong>keys</strong> =&gt; ({} -&gt; [String])</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.keys = keys = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> Object.keys a</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>map</strong> =&gt; (a -&gt; a) -&gt; ([a] -&gt; [a])</p>
 
             </div>
             
@@ -87,13 +105,13 @@ p = <span class="hljs-built_in">console</span>.log</pre></div></div>
         </li>
         
         
-        <li id="section-5">
+        <li id="section-6">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p><strong>mapObj</strong> =&gt; (a -&gt; a) -&gt; | {} -&gt; {}</p>
+              <p><strong>mapObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {})</p>
 
             </div>
             
@@ -107,13 +125,13 @@ p = <span class="hljs-built_in">console</span>.log</pre></div></div>
         </li>
         
         
-        <li id="section-6">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p><strong>pipe</strong> =&gt; [(a -&gt; a)] -&gt; | a -&gt; a</p>
+              <p><strong>pipe</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; a)</p>
 
             </div>
             
@@ -129,13 +147,13 @@ p = <span class="hljs-built_in">console</span>.log</pre></div></div>
         </li>
         
         
-        <li id="section-7">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p><strong>traverseObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {}) -&gt; | {} -&gt; {}</p>
+              <p><strong>traverseObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {})</p>
 <p>The first object function is executed before descending, the second operates
 on the object resulting after descending</p>
 
@@ -154,7 +172,10 @@ on the object resulting after descending</p>
     preFcn
     loopOverObj
     postFcn
-  )</pre></div></div>
+  )
+
+
+defers.forEach (fcn) -&gt; fcn()</pre></div></div>
             
         </li>
         

@@ -2,20 +2,30 @@
 x = module.exports
 p = console.log
 
+defers = []
+
+
 #
-#**id** => | a -> a
+#**clone** => {} -> {}
+#
+defers.push ->
+  x.clone = clone = traverseObj id,id,id
+
+
+#
+#**id** => a -> a
 #
 x.id = id = (a) -> a
 
 
 #
-#**keys** => | {} -> [String]
+#**keys** => ({} -> [String])
 #
 x.keys = keys = (a) -> Object.keys a
 
 
 #
-#**map** => (a -> a) -> | [a] -> [a]
+#**map** => (a -> a) -> ([a] -> [a])
 #
 x.map = map = (fcn) ->
   (lst) ->
@@ -26,7 +36,7 @@ x.map = map = (fcn) ->
 
 
 #
-#**mapObj** => (a -> a) -> | {} -> {}
+#**mapObj** => (a -> a) -> ({} -> {})
 #
 x.mapObj = mapObj = (fcn) ->
   (obj) ->
@@ -37,7 +47,7 @@ x.mapObj = mapObj = (fcn) ->
     
 
 #
-#**pipe** => [(a -> a)] -> | a -> a
+#**pipe** => [(a -> a)] -> (a -> a)
 #
 x.pipe = pipe = ->
   fcns = []
@@ -48,12 +58,9 @@ x.pipe = pipe = ->
       val = fcn(val)
     val
     
-    
-  
-
 
 #
-#**traverseObj** => (a -> a) -> ({} -> {}) -> ({} -> {}) -> | {} -> {}
+#**traverseObj** => (a -> a) -> ({} -> {}) -> ({} -> {}) -> ({} -> {})
 #
 # The first object function is executed before descending, the second operates
 # on the object resulting after descending
@@ -72,3 +79,6 @@ x.traverseObj = traverseObj = (valFcn, preFcn, postFcn) ->
     loopOverObj
     postFcn
   )
+
+
+defers.forEach (fcn) -> fcn()

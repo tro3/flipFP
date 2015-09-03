@@ -4,6 +4,23 @@ p = console.log
 fp = require '../src/flipFP'
 
 
+describe 'clone', ->
+  it 'handles basic case', ->
+    val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
+    assert.deepEqual fp.clone(val), val
+    assert.isFalse fp.clone(val) == val
+
+
+describe 'keys', ->
+  it 'handles handles basic case', ->
+    val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
+    assert.sameMembers fp.keys(val), ['a','b','d','f']
+
+
+describe 'id', ->
+  it 'handles handles basic case', ->
+    val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
+    assert.equal fp.id(val), val
 
 
 describe 'map', ->
@@ -37,15 +54,11 @@ describe 'traverseObj', ->
     assert.deepEqual testFn(val), val
     
   it 'handles basic case', ->
-    a = []
-    b = []
-    c = []
-      
     valFn = (x) -> x+1
     preFn = (x) -> x['pre']=1; x
     postFn = (x) -> x['post']=1; x
-      
     testFn = fp.traverseObj valFn, preFn, postFn
+
     val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
     exp =
       a:2
@@ -61,4 +74,5 @@ describe 'traverseObj', ->
       f:[5]
       pre:2
       post:1
+
     assert.deepEqual (testFn val), exp
