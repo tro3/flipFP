@@ -101,6 +101,11 @@ describe 'compose', ->
     assert.deepEqual fn(3, 1), 3
 
 
+describe 'concat', ->
+  it 'handles basic case', ->
+    assert.deepEqual fp.concat([1], [2,3], [4]), [1,2,3,4]
+
+
 describe 'composeP', ->
   class mockPromise
     constructor: (cb) ->
