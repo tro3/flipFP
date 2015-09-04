@@ -11,31 +11,36 @@ defers = []
 # Returns the curried function if passed a curried amount of parameters,
 # and the executed function if passed more
 #
-_maybeUncurry = (fn) ->
+_maybeUncurry = (fn1, fn2) ->
   () ->
-    if arguments.length > fn.length
-      fn.apply(null,[].slice.call(arguments, 0, fn.length))
-        .apply(null,[].slice.call(arguments, fn.length, arguments.length))
-    else fn.apply(null,arguments)
+    if arguments.length > fn1.length
+      fn2.apply(null,arguments)
+    else
+      fn1.apply(null,arguments)
 
 
 #
 #**all** => (a -> Boolean) -> ([a] -> Boolean)
 #
-x.all = all = (fn) ->
+_all = (fn) ->
   (lst) ->
     for item in lst
       return false if !(fn item)
     true
+_all2 = (fn, lst) -> _all(fn)(lst)    
+x.all = all = _maybeUncurry _all, _all2
+
 
 #
 #**allPass** => [(a -> Boolean)] -> (a -> Boolean)
 #
-x.allPass = allPass = (lst) ->
+_allPass = (lst) ->
   (val) ->
     for fcn in lst
       return false if !(fcn val)
     true
+_allPass2 = (lst, val) -> _allPass(lst)(val)    
+x.allPass = allPass = _maybeUncurry _allPass, _allPass2
 
 
 #
@@ -48,21 +53,25 @@ x.always = always = (val) ->
 #
 #**any** => (a -> Boolean) -> ([a] -> Boolean)
 #
-x.any = any = (fn) ->
+_any = (fn) ->
   (lst) ->
     for item in lst
       return true if (fn item)
     false
+_any2 = (fn, lst) -> _any(fn)(lst)    
+x.any = any = _maybeUncurry _any, _any2
 
 
 #
 #**anyPass** => [(a -> Boolean)] -> (a -> Boolean)
 #
-x.anyPass = anyPass = (lst) ->
+_anyPass = (lst) ->
   (val) ->
     for fcn in lst
       return true if (fcn val)
     false
+_anyPass2 = (lst, val) -> _anyPass(lst)(val)    
+x.anyPass = anyPass = _maybeUncurry _anyPass, _anyPass2
 
 
 #
@@ -123,7 +132,8 @@ _drop = (n) ->
     for i in [n...lst.length]
       r.push lst[i]
     r
-x.drop = drop = _maybeUncurry _drop
+_drop2 = (n, lst) -> _drop(n)(lst)
+x.drop = drop = _maybeUncurry _drop, _drop2
 
 
 #
@@ -147,7 +157,8 @@ _map = (fcn) ->
     for item in lst
       result.push fcn(item)
     result
-x.map = map = _maybeUncurry _map
+_map2 = (fcn, lst) -> _map(fcn)(lst)
+x.map = map = _maybeUncurry _map, _map2
   
 
 #
@@ -216,7 +227,8 @@ _take = (n) ->
     for i in [0...n]
       r.push lst[i]
     r
-x.take = take = _maybeUncurry _take
+_take2 = (n, lst) -> _take(n)(lst)
+x.take = take = _maybeUncurry _take, _take2
 
 
 #
@@ -232,7 +244,7 @@ x.traverseObj = traverseObj = (valFcn, preFcn, postFcn) ->
     else valFcn val
 
   loopOverObj = mapObj loopFn
-  loopOverList = map loopFn
+  loopOverList = _map loopFn
   
   processObj = pipe(
     preFcn
@@ -250,7 +262,9 @@ _zip = (keys) ->
     for i in [0...keys.length]
       r[keys[i]] = vals[i]
     r
-x.zip = zip = _maybeUncurry _zip
+_zip2 = (keys, vals) -> _zip(keys)(vals)
+x.zip = zip = _maybeUncurry _zip, _zip2
+
 
 
 defers.forEach (fcn) -> fcn()
@@ -278,3 +292,4 @@ defers.forEach (fcn) -> fcn()
 #for i in [0...n]
 #  zip keys, vals
 #p Date.now() - t0
+

@@ -6,44 +6,72 @@ fp = require '../src/flipFP'
 
 describe 'all', ->
   it 'handles basic cases', ->
-    gt5 = fp.all (x) -> x > 5
-    assert.isTrue gt5 [6,7,8,9]
-    assert.isFalse gt5 [6,7,1,9]
+    testFn = fp.all (x) -> x > 5
+    assert.isTrue testFn [6,7,8,9]
+    assert.isFalse testFn [6,7,1,9]
+
+  it 'handles noncurried cases', ->
+    testFn = (x) -> x > 5
+    assert.isTrue fp.all testFn, [6,7,8,9]
+    assert.isFalse fp.all testFn, [6,7,1,9]
 
 
 describe 'allPass', ->
   it 'handles basic cases', ->
-    test = fp.allPass [
+    testFn = fp.allPass [
       (x) -> x > 5
       (x) -> x < 10
     ]
-    assert.isTrue test 6
-    assert.isFalse test 1
-    assert.isFalse test 12
+    assert.isTrue testFn 6
+    assert.isFalse testFn 1
+    assert.isFalse testFn 12
+
+  it 'handles noncurried cases', ->
+    testFn = [
+      (x) -> x > 5
+      (x) -> x < 10
+    ]
+    assert.isTrue fp.allPass testFn, 6
+    assert.isFalse fp.allPass testFn, 1
+    assert.isFalse fp.allPass testFn, 12
 
 
 describe 'always', ->
-  it 'handles basic cases', ->
+  it 'handles basic case', ->
     test = fp.always 1
     assert.equal (test 6), 1
 
 
 describe 'any', ->
   it 'handles basic cases', ->
-    gt5 = fp.any (x) -> x > 5
-    assert.isTrue gt5 [1,3,7,3]
-    assert.isFalse gt5 [2,3,1,4]
+    testFn = fp.any (x) -> x > 5
+    assert.isTrue testFn [1,3,7,3]
+    assert.isFalse testFn [2,3,1,4]
+
+  it 'handles noncurried cases', ->
+    testFn = (x) -> x > 5
+    assert.isTrue fp.any testFn, [1,3,7,3]
+    assert.isFalse fp.any testFn, [2,3,1,4]
 
 
 describe 'anyPass', ->
   it 'handles basic cases', ->
-    test = fp.anyPass [
+    testFn = fp.anyPass [
       (x) -> x > 10
       (x) -> x < 5
     ]
-    assert.isTrue test 3
-    assert.isTrue test 12
-    assert.isFalse test 8    
+    assert.isTrue testFn 3
+    assert.isTrue testFn 12
+    assert.isFalse testFn 8    
+
+  it 'handles noncurried cases', ->
+    testFn = [
+      (x) -> x > 10
+      (x) -> x < 5
+    ]
+    assert.isTrue fp.anyPass testFn, 3
+    assert.isTrue fp.anyPass testFn, 12
+    assert.isFalse fp.anyPass testFn, 8    
 
 
 describe 'chain', ->
