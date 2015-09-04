@@ -116,6 +116,10 @@ describe 'map', ->
     fn = fp.map (x) -> x._id += 1; x
     assert.deepEqual (fn [{_id:1}, {_id:2}]), [{_id:2}, {_id:3}]
 
+  it 'handles uncurried case', ->
+    fn = (x) -> x+1
+    assert.deepEqual (fp.map fn, [1,2,3]), [2,3,4]
+
 
 describe 'mapObj', ->
   it 'handles basic case', ->
@@ -198,3 +202,12 @@ describe 'traverseObj', ->
       post:1
 
     assert.deepEqual (testFn val), exp
+
+
+describe 'zip', ->
+  it 'handles the basic case', ->
+    testFn = fp.zip(['a','b'])
+    assert.deepEqual testFn([1,2]), {a:1, b:2}
+
+  it 'handles the noncurried case', ->
+    assert.deepEqual fp.zip(['a','b'],[1,2]), {a:1, b:2}

@@ -3,6 +3,20 @@ x = module.exports
 p = console.log
 
 defers = []
+  
+  
+#
+#**_maybeUncurry** => (* -> *) -> (* -> *)
+#
+# Returns the curried function if passed a curried amount of parameters,
+# and the executed function if passed more
+#
+_maybeUncurry = (fn) ->
+  () ->
+    if arguments.length > fn.length
+      fn.apply(null,[].slice.call(arguments, 0, fn.length))
+        .apply(null,[].slice.call(arguments, fn.length, arguments.length))
+    else fn.apply(null,arguments)
 
 
 #
@@ -101,6 +115,18 @@ defers.push ->
 
 
 #
+#**drop** => Int -> ([] -> {})
+#
+_drop = (n) ->
+  (lst) ->
+    r = []
+    for i in [n...lst.length]
+      r.push lst[i]
+    r
+x.drop = drop = _maybeUncurry _drop
+
+
+#
 #**id** => a -> a
 #
 x.id = id = (a) -> a
@@ -115,13 +141,14 @@ x.keys = keys = (a) -> Object.keys a
 #
 #**map** => (a -> a) -> ([a] -> [a])
 #
-x.map = map = (fcn) ->
+_map = (fcn) ->
   (lst) ->
     result = []
     for item in lst
       result.push fcn(item)
     result
-
+x.map = map = _maybeUncurry _map
+  
 
 #
 #**mapObj** => (a -> a) -> ({} -> {})
@@ -179,6 +206,19 @@ x.pipeP = pipeP = ->
   q = fcns[0].apply(0, arguments)
   reduce(_pipeP, q, fcns[1..])
 
+
+#
+#**take** => Int -> ([] -> {})
+#
+_take = (n) ->
+  (lst) ->
+    r = []
+    for i in [0...n]
+      r.push lst[i]
+    r
+x.take = take = _maybeUncurry _take
+
+
 #
 #**traverseObj** => (a -> a) -> ({} -> {}) -> ({} -> {}) -> ({} -> {})
 #
@@ -201,4 +241,40 @@ x.traverseObj = traverseObj = (valFcn, preFcn, postFcn) ->
   )
 
 
+#
+#**zip** => [] -> ([] -> {})
+#
+_zip = (keys) ->
+  (vals) ->
+    r = {}
+    for i in [0...keys.length]
+      r[keys[i]] = vals[i]
+    r
+x.zip = zip = _maybeUncurry _zip
+
+
 defers.forEach (fcn) -> fcn()
+
+
+#Speed testing
+
+#keys = ['a','b','c','d','e']
+#vals = [1,2,3,4,5]
+#f0 = _zip keys
+#f1 = zip keys
+#n=1000000
+#
+#t0 = Date.now()
+#for i in [0...n]
+#  f0 vals
+#p Date.now() - t0
+#
+#t0 = Date.now()
+#for i in [0...n]
+#  f1 vals
+#p Date.now() - t0
+#
+#t0 = Date.now()
+#for i in [0...n]
+#  zip keys, vals
+#p Date.now() - t0
