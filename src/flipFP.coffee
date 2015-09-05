@@ -285,6 +285,22 @@ x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2
 
 
 #
+#**splitHead** => [a] -> [a,[]]
+#
+x.splitHead = splitHead = (lst) -> [lst[0], tail lst]
+
+
+#
+#**tail** => [] -> []
+#
+x.tail = tail = (lst) ->
+    r = []
+    for i in [1...lst.length]
+      r.push lst[i]
+    r
+
+
+#
 #**take** => Int -> ([] -> {})
 #
 _take = (n) ->

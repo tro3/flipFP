@@ -250,6 +250,16 @@ describe 'splitAt', ->
     assert.deepEqual fp.splitAt(1, [1,2,3]), [[1],[2,3]]
 
 
+describe 'splitHead', ->
+  it 'handles basic case', ->
+    assert.deepEqual fp.splitHead([1,2,3]), [1,[2,3]]
+
+
+describe 'tail', ->
+  it 'handles basic case', ->
+    assert.deepEqual fp.tail([1,2,3]), [2,3]
+
+
 describe 'traverseObj', ->
   it 'handles the copy case', ->
     testFn = fp.traverseObj(fp.id, fp.id, fp.id)
