@@ -105,6 +105,9 @@ describe 'concat', ->
   it 'handles basic case', ->
     assert.deepEqual fp.concat([1], [2,3], [4]), [1,2,3,4]
 
+  it 'handles non-Array case', ->
+    assert.deepEqual fp.concat(1, [2,3], 4), [1,2,3,4]
+
 
 describe 'composeP', ->
   class mockPromise

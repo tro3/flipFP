@@ -219,10 +219,10 @@ x.anyPass = anyPass = _maybeUncurry _anyPass, _anyPass2</pre></div></div>
             <div class="content"><div class='highlight'><pre>x.concat = concat = <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
   result = []
   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..arguments.length]
-    <span class="hljs-keyword">for</span> list <span class="hljs-keyword">in</span> arguments[i]
-      list = [list] <span class="hljs-keyword">if</span> !(list <span class="hljs-keyword">instanceof</span> Array)
-      <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> list
-        result.push item
+    list = arguments[i]
+    list = [list] <span class="hljs-keyword">if</span> !(list <span class="hljs-keyword">instanceof</span> Array)
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> list
+      result.push item
   result</pre></div></div>
             
         </li>

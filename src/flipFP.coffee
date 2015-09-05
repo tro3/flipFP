@@ -107,10 +107,10 @@ x.compose = compose = ->
 x.concat = concat = () ->
   result = []
   for i in [0...arguments.length]
-    for list in arguments[i]
-      list = [list] if !(list instanceof Array)
-      for item in list
-        result.push item
+    list = arguments[i]
+    list = [list] if !(list instanceof Array)
+    for item in list
+      result.push item
   result
 
 
