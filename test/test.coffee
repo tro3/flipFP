@@ -186,16 +186,6 @@ describe 'mapObj', ->
     assert.deepEqual (fn {a:1, b:1}), {a:2, b:2}
 
 
-describe 'reduce', ->
-  it 'handles basic case', ->
-    testFn = fp.reduce ((acc, val) -> acc+val), 0
-    assert.equal testFn([1,2,3]), 6
-
-  it 'handles variable init case', ->
-    testFn = fp.reduce ((acc, val) -> acc+val)
-    assert.equal testFn(1, [1,2,3]), 7
-
-
 describe 'pipe', ->
   it 'handles basic case', ->
     fn1 = (x) -> x+2
@@ -230,6 +220,25 @@ describe 'pipeP', ->
     testFn = fp.pipeP fn1, fn2, fn3
     testFn(3,1).then (val) ->      
       assert.deepEqual val, 4
+
+
+describe 'reduce', ->
+  it 'handles basic case', ->
+    testFn = fp.reduce ((acc, val) -> acc+val), 0
+    assert.equal testFn([1,2,3]), 6
+
+  it 'handles variable init case', ->
+    testFn = fp.reduce ((acc, val) -> acc+val)
+    assert.equal testFn(1, [1,2,3]), 7
+
+
+describe 'splitAt', ->
+  it 'handles basic case', ->
+    testFn = fp.splitAt 1
+    assert.deepEqual testFn([1,2,3]), [[1],[2,3]]
+
+  it 'handles noncurried case', ->
+    assert.deepEqual fp.splitAt(1, [1,2,3]), [[1],[2,3]]
 
 
 describe 'traverseObj', ->

@@ -212,24 +212,6 @@ x.mapObj = mapObj = (fcn) ->
 
 
 #
-#**reduce** => (a -> a) -> ({} -> {})
-#
-x.reduce = reduce = () ->
-  _reduce = (fcn, init, lst) ->
-    acc = init
-    for val in lst
-      acc = fcn(acc, val)
-    acc
-
-  fcn = arguments[0]
-  if arguments.length > 1
-    init = arguments[1]
-    (lst) -> _reduce(fcn, init, lst)
-  else
-    (init, lst) -> _reduce(fcn, init, lst)
-    
-
-#
 #**pipe** => [(a -> a)] -> (a -> a)
 #
 x.pipe = pipe = ->
@@ -255,6 +237,38 @@ x.pipeP = pipeP = ->
     fcns.push item
   q = fcns[0].apply(0, arguments)
   reduce(_pipeP, q, fcns[1..])
+
+
+#
+#**reduce** => (a -> a) -> ({} -> {})
+#
+x.reduce = reduce = () ->
+  _reduce = (fcn, init, lst) ->
+    acc = init
+    for val in lst
+      acc = fcn(acc, val)
+    acc
+
+  fcn = arguments[0]
+  if arguments.length > 1
+    init = arguments[1]
+    (lst) -> _reduce(fcn, init, lst)
+  else
+    (init, lst) -> _reduce(fcn, init, lst)
+
+
+#
+#**splitAt** => Int -> ([] -> [[],[]])
+#
+_splitAt = (n) ->
+  (lst) ->
+    r1 = []
+    r2 = []
+    for i in [0...lst.length]
+      if i < n then r1.push lst[i] else r2.push lst[i]
+    [r1,r2]
+_splitAt2 = (n, lst) -> _splitAt(n)(lst)
+x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2
 
 
 #
