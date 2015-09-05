@@ -163,6 +163,19 @@ x.filter = filter = _maybeUncurry _filter, _filter2
 
 
 #
+#**flatten** => [[]] -> []
+#
+x.flatten = flatten = (lst) ->
+  r = []
+  for item in lst
+    if item instanceof Array
+      subs = flatten item
+      r = r.concat subs
+    else r.push item
+  r
+
+
+#
 #**id** => a -> a
 #
 x.id = id = (a) -> a

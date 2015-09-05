@@ -129,7 +129,8 @@ describe 'composeP', ->
     testFn = fp.pipeP fn3, fn2, fn1
     testFn(3,1).then (val) ->      
       assert.deepEqual val, 4
-      
+
+
 describe 'filter', ->
   it 'handles basic case', ->
     testFn = fp.filter (x) -> x < 5
@@ -138,7 +139,15 @@ describe 'filter', ->
   it 'handles noncurried case', ->
     testFn = (x) -> x < 5
     assert.deepEqual (fp.filter testFn, [1,6,4,8,2]), [1,4,2]
-      
+
+
+describe 'flatten', ->
+  it 'handles basic case', ->
+    assert.deepEqual fp.flatten([[1,2],[3,4]]), [1,2,3,4]
+
+  it 'handles nested case', ->
+    assert.deepEqual fp.flatten([[1,2],[[3],[4]]]), [1,2,3,4]
+
 
 describe 'keys', ->
   it 'handles handles basic case', ->
