@@ -515,7 +515,7 @@ on the object resulting after descending</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p><strong>zip</strong> =&gt; [] -&gt; ([] -&gt; {})</p>
+              <p><strong>zipObj</strong> =&gt; [] -&gt; ([] -&gt; {})</p>
 
             </div>
             
@@ -526,11 +526,7 @@ on the object resulting after descending</p>
       r[keys[i]] = vals[i]
     r
 <span class="hljs-function"><span class="hljs-title">_zip2</span> = <span class="hljs-params">(keys, vals)</span> -&gt;</span> _zip(keys)(vals)
-x.zip = zip = _maybeUncurry _zip, _zip2
-
-
-
-defers.forEach (fcn) -&gt; fcn()</pre></div></div>
+x.zipObj = zipObj = _maybeUncurry _zip, _zip2</pre></div></div>
             
         </li>
         
@@ -541,9 +537,22 @@ defers.forEach (fcn) -&gt; fcn()</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <p>Speed testing</p>
+              <p><strong>zipKeys</strong> =&gt; (String -&gt; a) -&gt; ([String] -&gt; {})</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_zipKeys</span> = <span class="hljs-params">(fcn)</span> -&gt;</span>
+  (keys) -&gt;
+    r = {}
+    <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> keys
+      r[key] = fcn key
+    r
+<span class="hljs-function"><span class="hljs-title">_zipKeys2</span> = <span class="hljs-params">(fcn, keys)</span> -&gt;</span> _zipKeys(fcn)(keys)
+x.zipKeys = zipKeys = _maybeUncurry _zipKeys, _zipKeys2
+
+
+
+defers.forEach (fcn) -&gt; fcn()</pre></div></div>
             
         </li>
         
@@ -553,6 +562,19 @@ defers.forEach (fcn) -&gt; fcn()</pre></div></div>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>Speed testing</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>keys = [‘a’,’b’,’c’,’d’,’e’]
 vals = [1,2,3,4,5]

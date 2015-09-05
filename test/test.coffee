@@ -249,10 +249,20 @@ describe 'traverseObj', ->
     assert.deepEqual (testFn val), exp
 
 
-describe 'zip', ->
+describe 'zipObj', ->
   it 'handles the basic case', ->
-    testFn = fp.zip(['a','b'])
+    testFn = fp.zipObj(['a','b'])
     assert.deepEqual testFn([1,2]), {a:1, b:2}
 
   it 'handles the noncurried case', ->
-    assert.deepEqual fp.zip(['a','b'],[1,2]), {a:1, b:2}
+    assert.deepEqual fp.zipObj(['a','b'],[1,2]), {a:1, b:2}
+
+
+describe 'zipKeys', ->
+  it 'handles the basic case', ->
+    testFn = fp.zipKeys (x) -> x[0].toUpperCase()
+    assert.deepEqual testFn(['add', 'subtract']), {add:'A', subtract:'S'}
+
+  it 'handles the noncurried case', ->
+    testFn = (x) -> x[0].toUpperCase()
+    assert.deepEqual (fp.zipKeys testFn, ['add', 'subtract']), {add:'A', subtract:'S'}

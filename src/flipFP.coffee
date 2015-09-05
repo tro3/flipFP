@@ -280,7 +280,7 @@ x.traverseObj = traverseObj = (valFcn, preFcn, postFcn) ->
 
 
 #
-#**zip** => [] -> ([] -> {})
+#**zipObj** => [] -> ([] -> {})
 #
 _zip = (keys) ->
   (vals) ->
@@ -289,7 +289,20 @@ _zip = (keys) ->
       r[keys[i]] = vals[i]
     r
 _zip2 = (keys, vals) -> _zip(keys)(vals)
-x.zip = zip = _maybeUncurry _zip, _zip2
+x.zipObj = zipObj = _maybeUncurry _zip, _zip2
+
+
+#
+#**zipKeys** => (String -> a) -> ([String] -> {})
+#
+_zipKeys = (fcn) ->
+  (keys) ->
+    r = {}
+    for key in keys
+      r[key] = fcn key
+    r
+_zipKeys2 = (fcn, keys) -> _zipKeys(fcn)(keys)
+x.zipKeys = zipKeys = _maybeUncurry _zipKeys, _zipKeys2
 
 
 
