@@ -166,6 +166,20 @@ describe 'map', ->
     assert.deepEqual (fp.map fn, [1,2,3]), [2,3,4]
 
 
+describe 'mapIndex', ->
+  it 'handles list of primitives', ->
+    fn = fp.mapIndex (x, i) -> i
+    assert.deepEqual (fn [1,2,3]), [0,1,2]
+
+  it 'handles list of objects', ->      
+    fn = fp.mapIndex (x, i) -> {a:x._id, b:i}
+    assert.deepEqual (fn [{_id:1}, {_id:2}]), [{a:1, b:0}, {a:2, b:1}]
+
+  it 'handles uncurried case', ->
+    fn = (x, i) -> i+1
+    assert.deepEqual (fp.mapIndex fn, [3,2,1]), [1,2,3]
+
+
 describe 'mapObj', ->
   it 'handles basic case', ->
     fn = fp.mapObj (x) -> x+1

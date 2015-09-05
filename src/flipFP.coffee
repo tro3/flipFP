@@ -185,6 +185,19 @@ _map = (fcn) ->
     result
 _map2 = (fcn, lst) -> _map(fcn)(lst)
 x.map = map = _maybeUncurry _map, _map2
+
+
+#
+#**mapIndex** => (a,Int -> a) -> ([a] -> [a])
+#
+_mapIndex = (fcn) ->
+  (lst) ->
+    result = []
+    for i in [0...lst.length]
+      result.push fcn(lst[i], i)
+    result
+_mapIndex2 = (fcn, lst) -> _mapIndex(fcn)(lst)
+x.mapIndex = mapIndex = _maybeUncurry _mapIndex, _mapIndex2
   
 
 #
