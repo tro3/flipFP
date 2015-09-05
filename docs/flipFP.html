@@ -296,11 +296,18 @@ x.drop = drop = _maybeUncurry _drop, _drop2</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p><strong>id</strong> =&gt; a -&gt; a</p>
+              <p><strong>filter</strong> =&gt; (a -&gt; a) -&gt; ([] -&gt; [])</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>x.id = id = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> a</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_filter</span> = <span class="hljs-params">(fcn)</span> -&gt;</span>
+  (lst) -&gt;
+    r = []
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
+      r.push item <span class="hljs-keyword">if</span> fcn item
+    r
+<span class="hljs-function"><span class="hljs-title">_filter2</span> = <span class="hljs-params">(n, lst)</span> -&gt;</span> _filter(n)(lst)
+x.filter = filter = _maybeUncurry _filter, _filter2</pre></div></div>
             
         </li>
         
@@ -311,11 +318,11 @@ x.drop = drop = _maybeUncurry _drop, _drop2</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p><strong>keys</strong> =&gt; ({} -&gt; [String])</p>
+              <p><strong>id</strong> =&gt; a -&gt; a</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>x.keys = keys = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> Object.keys a</pre></div></div>
+            <div class="content"><div class='highlight'><pre>x.id = id = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> a</pre></div></div>
             
         </li>
         
@@ -325,6 +332,21 @@ x.drop = drop = _maybeUncurry _drop, _drop2</pre></div></div>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p><strong>keys</strong> =&gt; ({} -&gt; [String])</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.keys = keys = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> Object.keys a</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p><strong>map</strong> =&gt; (a -&gt; a) -&gt; ([a] -&gt; [a])</p>
 
@@ -342,11 +364,11 @@ x.map = map = _maybeUncurry _map, _map2</pre></div></div>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p><strong>mapObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {})</p>
 
@@ -362,11 +384,11 @@ x.map = map = _maybeUncurry _map, _map2</pre></div></div>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p><strong>reduce</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {})</p>
 
@@ -389,11 +411,11 @@ x.map = map = _maybeUncurry _map, _map2</pre></div></div>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p><strong>pipe</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; a)</p>
 
@@ -412,11 +434,11 @@ x.map = map = _maybeUncurry _map, _map2</pre></div></div>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p><strong>pipeP</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; a)</p>
 
@@ -435,11 +457,11 @@ x.map = map = _maybeUncurry _map, _map2</pre></div></div>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p><strong>take</strong> =&gt; Int -&gt; ([] -&gt; {})</p>
 
@@ -457,11 +479,11 @@ x.take = take = _maybeUncurry _take, _take2</pre></div></div>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p><strong>traverseObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {})</p>
 <p>The first object function is executed before descending, the second operates
@@ -487,11 +509,11 @@ on the object resulting after descending</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p><strong>zip</strong> =&gt; [] -&gt; ([] -&gt; {})</p>
 
@@ -513,11 +535,11 @@ defers.forEach (fcn) -&gt; fcn()</pre></div></div>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Speed testing</p>
 
@@ -526,11 +548,11 @@ defers.forEach (fcn) -&gt; fcn()</pre></div></div>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>keys = [‘a’,’b’,’c’,’d’,’e’]
 vals = [1,2,3,4,5]

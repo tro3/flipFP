@@ -130,6 +130,15 @@ describe 'composeP', ->
     testFn(3,1).then (val) ->      
       assert.deepEqual val, 4
       
+describe 'filter', ->
+  it 'handles basic case', ->
+    testFn = fp.filter (x) -> x < 5
+    assert.deepEqual (testFn [1,6,4,8,2]), [1,4,2]
+
+  it 'handles noncurried case', ->
+    testFn = (x) -> x < 5
+    assert.deepEqual (fp.filter testFn, [1,6,4,8,2]), [1,4,2]
+      
 
 describe 'keys', ->
   it 'handles handles basic case', ->

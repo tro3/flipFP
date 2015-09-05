@@ -150,6 +150,19 @@ x.drop = drop = _maybeUncurry _drop, _drop2
 
 
 #
+#**filter** => (a -> a) -> ([] -> [])
+#
+_filter = (fcn) ->
+  (lst) ->
+    r = []
+    for item in lst
+      r.push item if fcn item
+    r
+_filter2 = (n, lst) -> _filter(n)(lst)
+x.filter = filter = _maybeUncurry _filter, _filter2
+
+
+#
 #**id** => a -> a
 #
 x.id = id = (a) -> a
