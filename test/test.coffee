@@ -74,6 +74,22 @@ describe 'anyPass', ->
     assert.isFalse fp.anyPass testFn, 8    
 
 
+describe 'callAll', ->
+  it 'handles basic case', ->
+    testFn = fp.callAll [
+      (x) -> x + 1
+      (x) -> x - 2
+    ]
+    assert.deepEqual (testFn 8), [9, 6]    
+
+  it 'handles noncurried case', ->
+    testFns = [
+      (x) -> x + 1
+      (x) -> x - 2
+    ]
+    assert.deepEqual fp.callAll(testFns, 8), [9, 6]    
+
+
 describe 'chain', ->
   it 'handles basic case', ->
     testFn = fp.chain (x) -> [x,x]

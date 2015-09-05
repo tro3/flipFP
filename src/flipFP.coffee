@@ -75,6 +75,19 @@ x.anyPass = anyPass = _maybeUncurry _anyPass, _anyPass2
 
 
 #
+#**callAll** => [(a -> a)] -> (a -> [])
+#
+_callAll = (fcns) ->
+  (val) ->
+    result = []
+    for fcn in fcns
+      result.push fcn val
+    result
+_callAll2 = (fcns, val) -> _callAll(fcns)(val)    
+x.callAll = callAll = _maybeUncurry _callAll, _callAll2
+
+
+#
 #**chain** => (a -> []) -> ([a] -> [])
 #
 x.chain = chain = (fcn) ->
