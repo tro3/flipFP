@@ -67,19 +67,19 @@ and the executed function if passed more</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p><strong>_maybeCurry</strong> =&gt; (<em> -&gt; </em>) -&gt; (<em> -&gt; </em>)</p>
-<p>For one-param functions - Returns a curried function if passed
-a function as an argument, and the executed function if passed values</p>
+              <p><strong>splitAt</strong> =&gt; Int -&gt; ([] -&gt; [[],[]])</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_maybeCurry</span> = <span class="hljs-params">(fn)</span> -&gt;</span>
-  () -&gt;
-    <span class="hljs-keyword">if</span> arguments.length == <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> arguments[<span class="hljs-number">0</span>] == <span class="hljs-string">'function'</span>
-      fn2 = arguments[<span class="hljs-number">0</span>]
-      () -&gt; fn(fn2.apply(<span class="hljs-literal">null</span>,arguments))
-    <span class="hljs-keyword">else</span>
-      fn.apply(<span class="hljs-literal">null</span>,arguments)</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_splitAt</span> = <span class="hljs-params">(n)</span> -&gt;</span>
+  (lst) -&gt;
+    r1 = []
+    r2 = []
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..lst.length]
+      <span class="hljs-keyword">if</span> i &lt; n <span class="hljs-keyword">then</span> r1.push lst[i] <span class="hljs-keyword">else</span> r2.push lst[i]
+    [r1,r2]
+<span class="hljs-function"><span class="hljs-title">_splitAt2</span> = <span class="hljs-params">(n, lst)</span> -&gt;</span> _splitAt(n)(lst)
+x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2</pre></div></div>
             
         </li>
         
@@ -90,17 +90,26 @@ a function as an argument, and the executed function if passed values</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p><strong>all</strong> =&gt; (a -&gt; Boolean) -&gt; ([a] -&gt; Boolean)</p>
+              <p><strong>_maybeUncurryOrPipe</strong> =&gt; (<em> -&gt; </em>) -&gt; (<em> -&gt; </em>)</p>
+<p>Returns the curried function if passed a curried amount of parameters,
+and the executed function if passed more</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_all</span> = <span class="hljs-params">(fn)</span> -&gt;</span>
-  (lst) -&gt;
-    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
-      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> !(fn item)
-    <span class="hljs-literal">true</span>
-<span class="hljs-function"><span class="hljs-title">_all2</span> = <span class="hljs-params">(fn, lst)</span> -&gt;</span> _all(fn)(lst)    
-x.all = all = _maybeUncurry _all, _all2</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_maybeUncurryOrPipe</span> = <span class="hljs-params">(fcn)</span> -&gt;</span>
+  n = fcn.length
+  split = _splitAt n
+  () -&gt;
+    <span class="hljs-keyword">if</span> arguments.length &gt; fcn.length
+      [args1, args2] = split arguments  
+      fn1 = fcn.apply(<span class="hljs-literal">null</span>, args1)
+      <span class="hljs-keyword">if</span> args2.length == <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> args2[<span class="hljs-number">0</span>] == <span class="hljs-string">'function'</span>
+        fn2 = args2[<span class="hljs-number">0</span>]
+        () -&gt; fn1(fn2.apply(<span class="hljs-literal">null</span>,arguments))
+      <span class="hljs-keyword">else</span>
+        fn1.apply(<span class="hljs-literal">null</span>,args2)
+    <span class="hljs-keyword">else</span>
+      fcn.apply(<span class="hljs-literal">null</span>,arguments)</pre></div></div>
             
         </li>
         
@@ -111,17 +120,21 @@ x.all = all = _maybeUncurry _all, _all2</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p><strong>allPass</strong> =&gt; [(a -&gt; Boolean)] -&gt; (a -&gt; Boolean)</p>
+              <p><strong>_maybePipe</strong> =&gt; (<em> -&gt; </em>) -&gt; (<em> -&gt; </em>)</p>
+<p>For one-param functions - Returns a piped function if passed
+a function as an argument, and the executed function if passed values</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_allPass</span> = <span class="hljs-params">(lst)</span> -&gt;</span>
-  (val) -&gt;
-    <span class="hljs-keyword">for</span> fcn <span class="hljs-keyword">in</span> lst
-      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> !(fcn val)
-    <span class="hljs-literal">true</span>
-<span class="hljs-function"><span class="hljs-title">_allPass2</span> = <span class="hljs-params">(lst, val)</span> -&gt;</span> _allPass(lst)(val)    
-x.allPass = allPass = _maybeUncurry _allPass, _allPass2</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_maybePipe</span> = <span class="hljs-params">(fn)</span> -&gt;</span>
+  () -&gt;
+    <span class="hljs-keyword">if</span> arguments.length == <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> arguments[<span class="hljs-number">0</span>] == <span class="hljs-string">'function'</span>
+      p <span class="hljs-string">'piped'</span>
+      fn2 = arguments[<span class="hljs-number">0</span>]
+      () -&gt; fn(fn2.apply(<span class="hljs-literal">null</span>,arguments))
+    <span class="hljs-keyword">else</span>
+      p <span class="hljs-string">'not piped'</span>, arguments
+      fn.apply(<span class="hljs-literal">null</span>,arguments)</pre></div></div>
             
         </li>
         
@@ -131,6 +144,46 @@ x.allPass = allPass = _maybeUncurry _allPass, _allPass2</pre></div></div>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><strong>all</strong> =&gt; (a -&gt; Boolean) -&gt; ([a] -&gt; Boolean)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_all</span> = <span class="hljs-params">(fn)</span> -&gt;</span>
+  (lst) -&gt;
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> !(fn item)
+    <span class="hljs-literal">true</span>
+x.all = all = _maybeUncurryOrPipe _all</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p><strong>allPass</strong> =&gt; [(a -&gt; Boolean)] -&gt; (a -&gt; Boolean)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_allPass</span> = <span class="hljs-params">(lst)</span> -&gt;</span>
+  (val) -&gt;
+    <span class="hljs-keyword">for</span> fcn <span class="hljs-keyword">in</span> lst
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> !(fcn val)
+    <span class="hljs-literal">true</span>
+x.allPass = allPass = _maybeUncurryOrPipe _allPass</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p><strong>always</strong> =&gt; a -&gt; (* -&gt; a)</p>
 
@@ -142,11 +195,11 @@ x.allPass = allPass = _maybeUncurry _allPass, _allPass2</pre></div></div>
         </li>
         
         
-        <li id="section-7">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p><strong>any</strong> =&gt; (a -&gt; Boolean) -&gt; ([a] -&gt; Boolean)</p>
 
@@ -163,11 +216,11 @@ x.any = any = _maybeUncurry _any, _any2</pre></div></div>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p><strong>anyPass</strong> =&gt; [(a -&gt; Boolean)] -&gt; (a -&gt; Boolean)</p>
 
@@ -184,11 +237,11 @@ x.anyPass = anyPass = _maybeUncurry _anyPass, _anyPass2</pre></div></div>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p><strong>callAll</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; [])</p>
 
@@ -206,11 +259,11 @@ x.callAll = callAll = _maybeUncurry _callAll, _callAll2</pre></div></div>
         </li>
         
         
-        <li id="section-10">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p><strong>chain</strong> =&gt; (a -&gt; []) -&gt; ([a] -&gt; [])</p>
 
@@ -227,11 +280,11 @@ x.callAll = callAll = _maybeUncurry _callAll, _callAll2</pre></div></div>
         </li>
         
         
-        <li id="section-11">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p><strong>compose</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; a)</p>
 
@@ -251,11 +304,11 @@ x.callAll = callAll = _maybeUncurry _callAll, _callAll2</pre></div></div>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p><strong>concat</strong> =&gt; []… -&gt; []</p>
 
@@ -273,11 +326,11 @@ x.callAll = callAll = _maybeUncurry _callAll, _callAll2</pre></div></div>
         </li>
         
         
-        <li id="section-13">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p><strong>composeP</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; a)</p>
 
@@ -297,11 +350,11 @@ x.callAll = callAll = _maybeUncurry _callAll, _callAll2</pre></div></div>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p><strong>clone</strong> =&gt; {} -&gt; {}</p>
 
@@ -313,11 +366,11 @@ x.callAll = callAll = _maybeUncurry _callAll, _callAll2</pre></div></div>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p><strong>drop</strong> =&gt; Int -&gt; ([] -&gt; {})</p>
 
@@ -335,11 +388,11 @@ x.drop = drop = _maybeUncurry _drop, _drop2</pre></div></div>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p><strong>filter</strong> =&gt; (a -&gt; Boolean) -&gt; ([] -&gt; [])</p>
 
@@ -357,11 +410,11 @@ x.filter = filter = _maybeUncurry _filter, _filter2</pre></div></div>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p><strong>filterIndex</strong> =&gt; (a,i -&gt; Boolean) -&gt; ([] -&gt; [])</p>
 
@@ -379,11 +432,11 @@ x.filterIndex = filterIndex = _maybeUncurry _filterIndex, _filterIndex2</pre></d
         </li>
         
         
-        <li id="section-18">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p><strong>flatten</strong> =&gt; [[]] -&gt; []</p>
 
@@ -397,42 +450,7 @@ x.filterIndex = filterIndex = _maybeUncurry _filterIndex, _filterIndex2</pre></d
       r = r.concat subs
     <span class="hljs-keyword">else</span> r.push item
   r
-x.flatten = flatten = _maybeCurry _flatten</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-19">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
-              </div>
-              <p><strong>id</strong> =&gt; a -&gt; a</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>x.id = id = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> a</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-20">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
-              </div>
-              <p><strong>isNothing</strong> =&gt; a -&gt; Boolean</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_isNothing</span> = <span class="hljs-params">(a)</span> -&gt;</span>
-  <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">if</span> a <span class="hljs-keyword">in</span> [<span class="hljs-literal">null</span>, <span class="hljs-literal">undefined</span>]
-  <span class="hljs-keyword">return</span> a.trim().length == <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> a == <span class="hljs-string">'string'</span>
-  <span class="hljs-keyword">return</span> Object.keys(a).length == <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> a == <span class="hljs-string">'object'</span> 
-  <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
-x.isNothing = isNothing = _maybeCurry _isNothing</pre></div></div>
+x.flatten = flatten = _maybePipe _flatten</pre></div></div>
             
         </li>
         
@@ -443,11 +461,11 @@ x.isNothing = isNothing = _maybeCurry _isNothing</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
-              <p><strong>keys</strong> =&gt; ({} -&gt; [String])</p>
+              <p><strong>id</strong> =&gt; a -&gt; a</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>x.keys = keys = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> Object.keys a</pre></div></div>
+            <div class="content"><div class='highlight'><pre>x.id = id = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> a</pre></div></div>
             
         </li>
         
@@ -457,6 +475,60 @@ x.isNothing = isNothing = _maybeCurry _isNothing</pre></div></div>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p><strong>init</strong> =&gt; [] -&gt; []</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.init = init = <span class="hljs-function"><span class="hljs-params">(lst)</span> -&gt;</span>
+    r = []
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..lst.length-<span class="hljs-number">1</span>]
+      r.push lst[i]
+    r</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p><strong>isNothing</strong> =&gt; a -&gt; Boolean</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_isNothing</span> = <span class="hljs-params">(a)</span> -&gt;</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">if</span> a <span class="hljs-keyword">in</span> [<span class="hljs-literal">null</span>, <span class="hljs-literal">undefined</span>]
+  <span class="hljs-keyword">return</span> a.trim().length == <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> a == <span class="hljs-string">'string'</span>
+  <span class="hljs-keyword">return</span> Object.keys(a).length == <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> a == <span class="hljs-string">'object'</span> 
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+x.isNothing = isNothing = _maybePipe _isNothing</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p><strong>keys</strong> =&gt; ({} -&gt; [String])</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.keys = keys = <span class="hljs-function"><span class="hljs-params">(a)</span> -&gt;</span> Object.keys a</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p><strong>map</strong> =&gt; (a -&gt; a) -&gt; ([a] -&gt; [a])</p>
 
@@ -474,11 +546,11 @@ x.map = map = _maybeUncurry _map, _map2</pre></div></div>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p><strong>mapIndex</strong> =&gt; (a,Int -&gt; a) -&gt; ([a] -&gt; [a])</p>
 
@@ -496,11 +568,11 @@ x.mapIndex = mapIndex = _maybeUncurry _mapIndex, _mapIndex2</pre></div></div>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p><strong>mapObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {})</p>
 
@@ -516,11 +588,11 @@ x.mapIndex = mapIndex = _maybeUncurry _mapIndex, _mapIndex2</pre></div></div>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p><strong>pipe</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; a)</p>
 
@@ -539,11 +611,11 @@ x.mapIndex = mapIndex = _maybeUncurry _mapIndex, _mapIndex2</pre></div></div>
         </li>
         
         
-        <li id="section-26">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p><strong>pipeP</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; a)</p>
 
@@ -562,11 +634,11 @@ x.mapIndex = mapIndex = _maybeUncurry _mapIndex, _mapIndex2</pre></div></div>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p><strong>prop</strong> =&gt; String -&gt; ({} -&gt; a)</p>
 
@@ -579,11 +651,11 @@ x.prop = prop = _maybeUncurry _prop, _prop2</pre></div></div>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p><strong>reduce</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {})</p>
 
@@ -606,34 +678,11 @@ x.prop = prop = _maybeUncurry _prop, _prop2</pre></div></div>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
-              </div>
-              <p><strong>splitAt</strong> =&gt; Int -&gt; ([] -&gt; [[],[]])</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_splitAt</span> = <span class="hljs-params">(n)</span> -&gt;</span>
-  (lst) -&gt;
-    r1 = []
-    r2 = []
-    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..lst.length]
-      <span class="hljs-keyword">if</span> i &lt; n <span class="hljs-keyword">then</span> r1.push lst[i] <span class="hljs-keyword">else</span> r2.push lst[i]
-    [r1,r2]
-<span class="hljs-function"><span class="hljs-title">_splitAt2</span> = <span class="hljs-params">(n, lst)</span> -&gt;</span> _splitAt(n)(lst)
-x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-30">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p><strong>splitHead</strong> =&gt; [a] -&gt; [a,[]]</p>
 
@@ -644,11 +693,26 @@ x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2</pre></div></div>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p><strong>splitHead</strong> =&gt; [a] -&gt; [a,[]]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.splitLast = splitLast = <span class="hljs-function"><span class="hljs-params">(lst)</span> -&gt;</span> [init lst, lst[-<span class="hljs-number">1.</span>.-<span class="hljs-number">1</span>]]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p><strong>tail</strong> =&gt; [] -&gt; []</p>
 
@@ -663,11 +727,11 @@ x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2</pre></div></div>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p><strong>take</strong> =&gt; Int -&gt; ([] -&gt; {})</p>
 
@@ -680,16 +744,16 @@ x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2</pre></div></div>
       r.push lst[i]
     r
 <span class="hljs-function"><span class="hljs-title">_take2</span> = <span class="hljs-params">(n, lst)</span> -&gt;</span> _take(n)(lst)
-x.take = take = _maybeUncurry _take, _take2</pre></div></div>
+x.take = take = _maybeUncurryOrPipe _take</pre></div></div>
             
         </li>
         
         
-        <li id="section-33">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p><strong>traverseObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {})</p>
 <p>The first object function is executed before descending, the second operates
@@ -715,11 +779,11 @@ on the object resulting after descending</p>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p><strong>zipObj</strong> =&gt; [] -&gt; ([] -&gt; {})</p>
 
@@ -737,11 +801,11 @@ x.zipObj = zipObj = _maybeUncurry _zip, _zip2</pre></div></div>
         </li>
         
         
-        <li id="section-35">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p><strong>zipKeys</strong> =&gt; (String -&gt; a) -&gt; ([String] -&gt; {})</p>
 
@@ -763,11 +827,11 @@ defers.forEach (fcn) -&gt; fcn()</pre></div></div>
         </li>
         
         
-        <li id="section-36">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>Speed testing</p>
 
@@ -776,11 +840,11 @@ defers.forEach (fcn) -&gt; fcn()</pre></div></div>
         </li>
         
         
-        <li id="section-37">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>keys = [‘a’,’b’,’c’,’d’,’e’]
 vals = [1,2,3,4,5]
@@ -798,6 +862,48 @@ p Date.now() - t0</p>
 <p>t0 = Date.now()
 for i in [0…n]
  zip keys, vals
+p Date.now() - t0</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
+              <p>map = _maybeUncurryOrPipe _map</p>
+<p>add = (x) -&gt; x + 1
+range = (x) -&gt; [0…x]</p>
+<p>p ‘compiling’</p>
+<p>mapAddA = _map add
+mapAddB = map add
+mapAddRange = map add, range</p>
+<p>p ‘executing’</p>
+<p>p mapAddA(range(4))
+p mapAddRange(4)
+p mapAddB(range(4))
+p map add, range(4)</p>
+<p>m = 10
+n = 150000</p>
+<p>t0 = Date.now()
+for i in [0…n]
+ mapAddA(range(m))
+p Date.now() - t0</p>
+<p>t0 = Date.now()
+for i in [0…n]
+ mapAddRange(m)
+p Date.now() - t0</p>
+<p>t0 = Date.now()
+for i in [0…n]
+ mapAddB(range(m))
+p Date.now() - t0</p>
+<p>t0 = Date.now()
+for i in [0…n]
+ map add, range(m)
 p Date.now() - t0</p>
 
             </div>

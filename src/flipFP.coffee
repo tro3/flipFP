@@ -19,18 +19,56 @@ _maybeUncurry = (fn1, fn2) ->
       fn1.apply(null,arguments)
 
 
+
+
 #
-#**_maybeCurry** => (* -> *) -> (* -> *)
+#**splitAt** => Int -> ([] -> [[],[]])
 #
-# For one-param functions - Returns a curried function if passed
+_splitAt = (n) ->
+  (lst) ->
+    r1 = []
+    r2 = []
+    for i in [0...lst.length]
+      if i < n then r1.push lst[i] else r2.push lst[i]
+    [r1,r2]
+_splitAt2 = (n, lst) -> _splitAt(n)(lst)
+x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2
+
+#
+#**_maybeUncurryOrPipe** => (* -> *) -> (* -> *)
+#
+# Returns the curried function if passed a curried amount of parameters,
+# and the executed function if passed more
+#
+_maybeUncurryOrPipe = (fcn) ->
+  n = fcn.length
+  split = _splitAt n
+  () ->
+    if arguments.length > fcn.length
+      [args1, args2] = split arguments  
+      fn1 = fcn.apply(null, args1)
+      if args2.length == 1 and typeof args2[0] == 'function'
+        fn2 = args2[0]
+        () -> fn1(fn2.apply(null,arguments))
+      else
+        fn1.apply(null,args2)
+    else
+      fcn.apply(null,arguments)
+
+#
+#**_maybePipe** => (* -> *) -> (* -> *)
+#
+# For one-param functions - Returns a piped function if passed
 # a function as an argument, and the executed function if passed values
 #
-_maybeCurry = (fn) ->
+_maybePipe = (fn) ->
   () ->
     if arguments.length == 1 and typeof arguments[0] == 'function'
+      p 'piped'
       fn2 = arguments[0]
       () -> fn(fn2.apply(null,arguments))
     else
+      p 'not piped', arguments
       fn.apply(null,arguments)
 
 
@@ -42,8 +80,7 @@ _all = (fn) ->
     for item in lst
       return false if !(fn item)
     true
-_all2 = (fn, lst) -> _all(fn)(lst)    
-x.all = all = _maybeUncurry _all, _all2
+x.all = all = _maybeUncurryOrPipe _all
 
 
 #
@@ -54,8 +91,7 @@ _allPass = (lst) ->
     for fcn in lst
       return false if !(fcn val)
     true
-_allPass2 = (lst, val) -> _allPass(lst)(val)    
-x.allPass = allPass = _maybeUncurry _allPass, _allPass2
+x.allPass = allPass = _maybeUncurryOrPipe _allPass
 
 
 #
@@ -214,13 +250,23 @@ _flatten = (lst) ->
       r = r.concat subs
     else r.push item
   r
-x.flatten = flatten = _maybeCurry _flatten
+x.flatten = flatten = _maybePipe _flatten
 
 
 #
 #**id** => a -> a
 #
 x.id = id = (a) -> a
+
+
+#
+#**init** => [] -> []
+#
+x.init = init = (lst) ->
+    r = []
+    for i in [0...lst.length-1]
+      r.push lst[i]
+    r
 
 
 #
@@ -231,7 +277,7 @@ _isNothing = (a) ->
   return a.trim().length == 0 if typeof a == 'string'
   return Object.keys(a).length == 0 if typeof a == 'object' 
   return false
-x.isNothing = isNothing = _maybeCurry _isNothing
+x.isNothing = isNothing = _maybePipe _isNothing
 
 
 #
@@ -331,24 +377,17 @@ x.reduce = reduce = () ->
     (init, lst) -> _reduce(fcn, init, lst)
 
 
-#
-#**splitAt** => Int -> ([] -> [[],[]])
-#
-_splitAt = (n) ->
-  (lst) ->
-    r1 = []
-    r2 = []
-    for i in [0...lst.length]
-      if i < n then r1.push lst[i] else r2.push lst[i]
-    [r1,r2]
-_splitAt2 = (n, lst) -> _splitAt(n)(lst)
-x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2
-
 
 #
 #**splitHead** => [a] -> [a,[]]
 #
 x.splitHead = splitHead = (lst) -> [lst[0], tail lst]
+
+
+#
+#**splitHead** => [a] -> [a,[]]
+#
+x.splitLast = splitLast = (lst) -> [init lst, lst[-1..-1]]
 
 
 #
@@ -371,7 +410,7 @@ _take = (n) ->
       r.push lst[i]
     r
 _take2 = (n, lst) -> _take(n)(lst)
-x.take = take = _maybeUncurry _take, _take2
+x.take = take = _maybeUncurryOrPipe _take
 
 
 #
@@ -449,3 +488,48 @@ defers.forEach (fcn) -> fcn()
 #  zip keys, vals
 #p Date.now() - t0
 
+# 
+#map = _maybeUncurryOrPipe _map
+#
+#add = (x) -> x + 1
+#range = (x) -> [0...x]
+#
+#
+#p 'compiling'
+#
+#mapAddA = _map add
+#mapAddB = map add
+#mapAddRange = map add, range
+#
+#
+#p 'executing'
+#
+#
+#p mapAddA(range(4))
+#p mapAddRange(4)
+#p mapAddB(range(4))
+#p map add, range(4)
+#
+#
+#m = 10
+#n = 150000
+#
+#t0 = Date.now()
+#for i in [0...n]
+#  mapAddA(range(m))
+#p Date.now() - t0
+#
+#t0 = Date.now()
+#for i in [0...n]
+#  mapAddRange(m)
+#p Date.now() - t0
+#
+#t0 = Date.now()
+#for i in [0...n]
+#  mapAddB(range(m))
+#p Date.now() - t0
+#
+#t0 = Date.now()
+#for i in [0...n]
+#  map add, range(m)
+#p Date.now() - t0

@@ -15,6 +15,12 @@ describe 'all', ->
     assert.isTrue fp.all testFn, [6,7,8,9]
     assert.isFalse fp.all testFn, [6,7,1,9]
 
+  it 'handles piped cases', ->
+    genFn = (x) -> [6,7,x,9]
+    testFn = fp.all ((x) -> x > 5), genFn
+    assert.isTrue testFn 8
+    assert.isFalse testFn 1
+
 
 describe 'allPass', ->
   it 'handles basic cases', ->
@@ -317,6 +323,19 @@ describe 'tail', ->
     assert.deepEqual fp.tail([1,2,3]), [2,3]
 
 
+describe 'take', ->
+  it 'handles basic case', ->
+    testFn = fp.take 2
+    assert.deepEqual testFn([1,2,3]), [1,2]
+
+  it 'handles piped case', ->
+    testFn = fp.take 2, (x) -> [x,x+1,4]
+    assert.deepEqual testFn(2), [2,3]
+
+  it 'handles direct case', ->
+    assert.deepEqual fp.take(2, [1,2,3]), [1,2]
+
+
 describe 'traverseObj', ->
   it 'handles the copy case', ->
     testFn = fp.traverseObj(fp.id, fp.id, fp.id)
@@ -365,3 +384,10 @@ describe 'zipKeys', ->
   it 'handles the noncurried case', ->
     testFn = (x) -> x[0].toUpperCase()
     assert.deepEqual (fp.zipKeys testFn, ['add', 'subtract']), {add:'A', subtract:'S'}
+
+
+describe 'natural piping', ->
+  it 'handles a basic case', ->
+    testFn = fp.take 2, fp.map fp.prop 'a'
+    assert.deepEqual testFn([{a:1,b:2}, {a:3,b:2}, {a:2,b:2}, {a:4,b:2}]), [1,3]
+
