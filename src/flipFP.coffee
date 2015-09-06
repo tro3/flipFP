@@ -211,6 +211,17 @@ x.id = id = (a) -> a
 
 
 #
+#**isNothing** => a -> Boolean
+#
+_isNothing = (a) ->
+  return true if a in [null, undefined]
+  return a.length == 0 if typeof a == 'string'
+  return Object.keys(a).length == 0 if typeof a == 'object' 
+  return false
+x.isNothing = isNothing = _maybeCurry _isNothing
+
+
+#
 #**keys** => ({} -> [String])
 #
 x.keys = keys = (a) -> Object.keys a

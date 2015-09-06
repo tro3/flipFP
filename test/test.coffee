@@ -181,6 +181,23 @@ describe 'id', ->
     assert.equal fp.id(val), val
 
 
+describe 'isNothing', ->
+  it 'handles handles basic cases', ->
+    assert.isTrue fp.isNothing(null), 'null'
+    assert.isTrue fp.isNothing(undefined), 'undefined'
+    assert.isTrue fp.isNothing(''), 'empty string'
+    assert.isTrue fp.isNothing([]), 'empty array'
+    assert.isTrue fp.isNothing({}), 'empty object'
+    assert.isFalse fp.isNothing(0), 'zero'
+    assert.isFalse fp.isNothing(false), 'false'
+
+  it 'handles handles curried cases', ->
+    testFn = fp.isNothing (x,y) -> if x == 1 then [] else [x+y]
+    assert.isTrue testFn(1,2)
+    assert.isFalse testFn(2,3)
+    
+
+
 describe 'map', ->
   it 'handles list of primitives', ->
     fn = fp.map (x) -> x+1
