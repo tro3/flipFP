@@ -186,6 +186,7 @@ describe 'isNothing', ->
     assert.isTrue fp.isNothing(null), 'null'
     assert.isTrue fp.isNothing(undefined), 'undefined'
     assert.isTrue fp.isNothing(''), 'empty string'
+    assert.isTrue fp.isNothing(' '), 'whitespace string'
     assert.isTrue fp.isNothing([]), 'empty array'
     assert.isTrue fp.isNothing({}), 'empty object'
     assert.isFalse fp.isNothing(0), 'zero'

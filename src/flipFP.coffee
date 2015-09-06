@@ -215,7 +215,7 @@ x.id = id = (a) -> a
 #
 _isNothing = (a) ->
   return true if a in [null, undefined]
-  return a.length == 0 if typeof a == 'string'
+  return a.trim().length == 0 if typeof a == 'string'
   return Object.keys(a).length == 0 if typeof a == 'object' 
   return false
 x.isNothing = isNothing = _maybeCurry _isNothing

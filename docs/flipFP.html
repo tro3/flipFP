@@ -407,7 +407,7 @@ x.flatten = flatten = _maybeCurry _flatten</pre></div></div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_isNothing</span> = <span class="hljs-params">(a)</span> -&gt;</span>
   <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">if</span> a <span class="hljs-keyword">in</span> [<span class="hljs-literal">null</span>, <span class="hljs-literal">undefined</span>]
-  <span class="hljs-keyword">return</span> a.length == <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> a == <span class="hljs-string">'string'</span>
+  <span class="hljs-keyword">return</span> a.trim().length == <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> a == <span class="hljs-string">'string'</span>
   <span class="hljs-keyword">return</span> Object.keys(a).length == <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> a == <span class="hljs-string">'object'</span> 
   <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
 x.isNothing = isNothing = _maybeCurry _isNothing</pre></div></div>
