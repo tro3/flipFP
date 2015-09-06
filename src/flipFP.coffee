@@ -5,21 +5,6 @@ p = console.log
 defers = []
   
   
-#
-#**_maybeUncurry** => (* -> *) -> (* -> *)
-#
-# Returns the curried function if passed a curried amount of parameters,
-# and the executed function if passed more
-#
-_maybeUncurry = (fn1, fn2) ->
-  () ->
-    if arguments.length > fn1.length
-      fn2.apply(null,arguments)
-    else
-      fn1.apply(null,arguments)
-
-
-
 
 #
 #**splitAt** => Int -> ([] -> [[],[]])
@@ -31,16 +16,18 @@ _splitAt = (n) ->
     for i in [0...lst.length]
       if i < n then r1.push lst[i] else r2.push lst[i]
     [r1,r2]
-_splitAt2 = (n, lst) -> _splitAt(n)(lst)
-x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2
+
 
 #
-#**_maybeUncurryOrPipe** => (* -> *) -> (* -> *)
+#**maybePipe** => (* -> *) -> (* -> *) or a
 #
-# Returns the curried function if passed a curried amount of parameters,
-# and the executed function if passed more
+# Returns the original function generator if passed the proper
+# amount of parameters, and if passed more will returned the
+# executed function unless there is only on extra param and a
+# function is passed.  In that case, the fucnction passed will
+# be piped to the generated function.
 #
-_maybeUncurryOrPipe = (fcn) ->
+x.maybePipe = maybePipe = (fcn) ->
   n = fcn.length
   split = _splitAt n
   () ->
@@ -55,21 +42,26 @@ _maybeUncurryOrPipe = (fcn) ->
     else
       fcn.apply(null,arguments)
 
+
+# Making up for the lack of export before maybePipe def'n
+x.splitAt = splitAt = maybePipe _splitAt
+
+
 #
-#**_maybePipe** => (* -> *) -> (* -> *)
+#**maybePipeDirect** => (* -> *) -> (* -> *) or a
 #
-# For one-param functions - Returns a piped function if passed
-# a function as an argument, and the executed function if passed values
+# Returns the executed original function if passed a value
+# as an argument.  If passed a function, it will
+# be piped to the original function.  Only works for
+# single-argument functions
 #
-_maybePipe = (fn) ->
-  () ->
-    if arguments.length == 1 and typeof arguments[0] == 'function'
-      p 'piped'
-      fn2 = arguments[0]
-      () -> fn(fn2.apply(null,arguments))
+x.maybePipeDirect = maybePipeDirect = (fcn) ->
+  (val) ->
+    if typeof val == 'function'
+      () -> fcn(val.apply(null,arguments))
     else
-      p 'not piped', arguments
-      fn.apply(null,arguments)
+      fcn(val)
+
 
 
 #
@@ -80,7 +72,7 @@ _all = (fn) ->
     for item in lst
       return false if !(fn item)
     true
-x.all = all = _maybeUncurryOrPipe _all
+x.all = all = maybePipe _all
 
 
 #
@@ -91,15 +83,16 @@ _allPass = (lst) ->
     for fcn in lst
       return false if !(fcn val)
     true
-x.allPass = allPass = _maybeUncurryOrPipe _allPass
+x.allPass = allPass = maybePipe _allPass
 
 
 #
 #**always** => a -> (* -> a)
 #
-x.always = always = (val) ->
+_always = (val) ->
   () -> val
-
+x.always = always = maybePipeDirect _always
+  
 
 #
 #**any** => (a -> Boolean) -> ([a] -> Boolean)
@@ -109,8 +102,7 @@ _any = (fn) ->
     for item in lst
       return true if (fn item)
     false
-_any2 = (fn, lst) -> _any(fn)(lst)    
-x.any = any = _maybeUncurry _any, _any2
+x.any = any = maybePipe _any
 
 
 #
@@ -121,8 +113,7 @@ _anyPass = (lst) ->
     for fcn in lst
       return true if (fcn val)
     false
-_anyPass2 = (lst, val) -> _anyPass(lst)(val)    
-x.anyPass = anyPass = _maybeUncurry _anyPass, _anyPass2
+x.anyPass = anyPass = maybePipe _anyPass
 
 
 #
@@ -134,26 +125,28 @@ _callAll = (fcns) ->
     for fcn in fcns
       result.push fcn val
     result
-_callAll2 = (fcns, val) -> _callAll(fcns)(val)    
-x.callAll = callAll = _maybeUncurry _callAll, _callAll2
+x.callAll = callAll = maybePipe _callAll
 
 
 #
 #**chain** => (a -> []) -> ([a] -> [])
 #
-x.chain = chain = (fcn) ->
+_chain = (fcn) ->
   (lst) ->
     result = []
     for item in lst
       for res in fcn(item)
         result.push res
     result
+x.chain = chain = maybePipe _chain
 
 
 #
 #**compose** => [(a -> a)] -> (a -> a)
 #
-x.compose = compose = ->
+# Can't be maybePipe'd due to unknown arg count
+#
+x.compose = compose = () ->
   fcns = []
   for item in arguments
     fcns.push item
@@ -162,24 +155,13 @@ x.compose = compose = ->
     val = fcns[0].apply(0, arguments)
     for fcn in fcns[1..]
       val = fcn(val)
-    val  
-
-
-#
-#**concat** => []... -> []
-#
-x.concat = concat = () ->
-  result = []
-  for i in [0...arguments.length]
-    list = arguments[i]
-    list = [list] if !(list instanceof Array)
-    for item in list
-      result.push item
-  result
+    val
 
 
 #
 #**composeP** => [(a -> a)] -> (a -> a)
+#
+# Can't be maybePipe'd due to unknown arg count
 #
 x.composeP = composeP = ->
   _pipeP = (f1,f2) ->
@@ -191,6 +173,22 @@ x.composeP = composeP = ->
   fcns = fcns.reverse()
   q = fcns[0].apply(0, arguments)
   reduce(_pipeP, q, fcns[1..])
+
+
+#
+#**concat** => []... -> []
+#
+# Can't be maybePipe'd due to unknown arg count
+#
+x.concat = concat = () ->
+  result = []
+  for i in [0...arguments.length]
+    list = arguments[i]
+    list = [list] if !(list instanceof Array)
+    for item in list
+      result.push item
+  result
+
   
   
 #
@@ -209,8 +207,7 @@ _drop = (n) ->
     for i in [n...lst.length]
       r.push lst[i]
     r
-_drop2 = (n, lst) -> _drop(n)(lst)
-x.drop = drop = _maybeUncurry _drop, _drop2
+x.drop = drop = maybePipe _drop
 
 
 #
@@ -222,8 +219,7 @@ _filter = (fcn) ->
     for item in lst
       r.push item if fcn item
     r
-_filter2 = (n, lst) -> _filter(n)(lst)
-x.filter = filter = _maybeUncurry _filter, _filter2
+x.filter = filter = maybePipe _filter
 
 
 #
@@ -235,8 +231,7 @@ _filterIndex = (fcn) ->
     for i in [0...lst.length]
       r.push lst[i] if fcn lst[i], i
     r
-_filterIndex2 = (n, lst) -> _filterIndex(n)(lst)
-x.filterIndex = filterIndex = _maybeUncurry _filterIndex, _filterIndex2
+x.filterIndex = filterIndex = maybePipe _filterIndex
 
 
 #
@@ -250,7 +245,7 @@ _flatten = (lst) ->
       r = r.concat subs
     else r.push item
   r
-x.flatten = flatten = _maybePipe _flatten
+x.flatten = flatten = maybePipeDirect _flatten
 
 
 #
@@ -262,11 +257,12 @@ x.id = id = (a) -> a
 #
 #**init** => [] -> []
 #
-x.init = init = (lst) ->
+_init = (lst) ->
     r = []
     for i in [0...lst.length-1]
       r.push lst[i]
     r
+x.init = init = maybePipe _init
 
 
 #
@@ -277,13 +273,14 @@ _isNothing = (a) ->
   return a.trim().length == 0 if typeof a == 'string'
   return Object.keys(a).length == 0 if typeof a == 'object' 
   return false
-x.isNothing = isNothing = _maybePipe _isNothing
+x.isNothing = isNothing = maybePipeDirect _isNothing
 
 
 #
 #**keys** => ({} -> [String])
 #
-x.keys = keys = (a) -> Object.keys a
+_keys = (a) -> Object.keys a
+x.keys = keys = maybePipeDirect _keys
 
 
 #
@@ -295,8 +292,7 @@ _map = (fcn) ->
     for item in lst
       result.push fcn(item)
     result
-_map2 = (fcn, lst) -> _map(fcn)(lst)
-x.map = map = _maybeUncurry _map, _map2
+x.map = map = maybePipe _map
 
 
 #
@@ -308,23 +304,25 @@ _mapIndex = (fcn) ->
     for i in [0...lst.length]
       result.push fcn(lst[i], i)
     result
-_mapIndex2 = (fcn, lst) -> _mapIndex(fcn)(lst)
-x.mapIndex = mapIndex = _maybeUncurry _mapIndex, _mapIndex2
+x.mapIndex = mapIndex = maybePipe _mapIndex
   
 
 #
 #**mapObj** => (a -> a) -> ({} -> {})
 #
-x.mapObj = mapObj = (fcn) ->
+_mapObj = (fcn) ->
   (obj) ->
     result = {}
     for key, item of obj
       result[key] = fcn(item)
     result
+x.mapObj = mapObj = maybePipe _mapObj
 
 
 #
 #**pipe** => [(a -> a)] -> (a -> a)
+#
+# Can't be maybePipe'd due to unknown arg count
 #
 x.pipe = pipe = ->
   fcns = []
@@ -339,6 +337,8 @@ x.pipe = pipe = ->
 
 #
 #**pipeP** => [(a -> a)] -> (a -> a)
+#
+# Can't be maybePipe'd due to unknown arg count
 #
 x.pipeP = pipeP = ->
   _pipeP = (f1,f2) ->
@@ -355,8 +355,7 @@ x.pipeP = pipeP = ->
 #**prop** => String -> ({} -> a)
 #
 _prop = (key) -> (obj) -> obj[key]
-_prop2 = (key, obj) -> _prop(key)(obj)
-x.prop = prop = _maybeUncurry _prop, _prop2
+x.prop = prop = maybePipe _prop
 
 
 #
@@ -377,27 +376,29 @@ x.reduce = reduce = () ->
     (init, lst) -> _reduce(fcn, init, lst)
 
 
-
 #
 #**splitHead** => [a] -> [a,[]]
 #
-x.splitHead = splitHead = (lst) -> [lst[0], tail lst]
+_splitHead = (lst) -> [lst[0], tail lst]
+x.splitHead = splitHead = maybePipeDirect _splitHead
 
 
 #
-#**splitHead** => [a] -> [a,[]]
+#**splitLast** => [a] -> [[],a]
 #
-x.splitLast = splitLast = (lst) -> [init lst, lst[-1..-1]]
+_splitHead = (lst) -> [init lst, lst[-1..-1]]
+x.splitLast = splitLast = maybePipeDirect _splitHead
 
 
 #
 #**tail** => [] -> []
 #
-x.tail = tail = (lst) ->
+_tail = (lst) ->
     r = []
     for i in [1...lst.length]
       r.push lst[i]
     r
+x.tail = tail = maybePipeDirect _tail
 
 
 #
@@ -409,8 +410,7 @@ _take = (n) ->
     for i in [0...n]
       r.push lst[i]
     r
-_take2 = (n, lst) -> _take(n)(lst)
-x.take = take = _maybeUncurryOrPipe _take
+x.take = take = maybePipe _take
 
 
 #
@@ -444,8 +444,7 @@ _zip = (keys) ->
     for i in [0...keys.length]
       r[keys[i]] = vals[i]
     r
-_zip2 = (keys, vals) -> _zip(keys)(vals)
-x.zipObj = zipObj = _maybeUncurry _zip, _zip2
+x.zipObj = zipObj = maybePipe _zip
 
 
 #
@@ -457,8 +456,7 @@ _zipKeys = (fcn) ->
     for key in keys
       r[key] = fcn key
     r
-_zipKeys2 = (fcn, keys) -> _zipKeys(fcn)(keys)
-x.zipKeys = zipKeys = _maybeUncurry _zipKeys, _zipKeys2
+x.zipKeys = zipKeys = maybePipe _zipKeys
 
 
 
@@ -489,7 +487,7 @@ defers.forEach (fcn) -> fcn()
 #p Date.now() - t0
 
 # 
-#map = _maybeUncurryOrPipe _map
+#map = maybePipe _map
 #
 #add = (x) -> x + 1
 #range = (x) -> [0...x]
