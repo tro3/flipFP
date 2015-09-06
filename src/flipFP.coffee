@@ -293,6 +293,14 @@ x.pipeP = pipeP = ->
 
 
 #
+#**prop** => String -> ({} -> a)
+#
+_prop = (key) -> (obj) -> obj[key]
+_prop2 = (key, obj) -> _prop(key)(obj)
+x.prop = prop = _maybeUncurry _prop, _prop2
+
+
+#
 #**reduce** => (a -> a) -> ({} -> {})
 #
 x.reduce = reduce = () ->

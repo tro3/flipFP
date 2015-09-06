@@ -268,6 +268,15 @@ describe 'pipeP', ->
       assert.deepEqual val, 4
 
 
+describe 'prop', ->
+  it 'handles basic case', ->
+    testFn = fp.map fp.prop 'id'
+    assert.deepEqual testFn([{id:1},{id:2}]), [1,2]
+
+  it 'handles uncurried case', ->
+    assert.equal (fp.prop 'id', {id:2}), 2
+
+
 describe 'reduce', ->
   it 'handles basic case', ->
     testFn = fp.reduce ((acc, val) -> acc+val), 0

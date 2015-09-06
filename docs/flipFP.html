@@ -546,6 +546,23 @@ x.mapIndex = mapIndex = _maybeUncurry _mapIndex, _mapIndex2</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
+              <p><strong>prop</strong> =&gt; String -&gt; ({} -&gt; a)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_prop</span> = <span class="hljs-params">(key)</span> -&gt;</span> (obj) -&gt; obj[key]
+<span class="hljs-function"><span class="hljs-title">_prop2</span> = <span class="hljs-params">(key, obj)</span> -&gt;</span> _prop(key)(obj)
+x.prop = prop = _maybeUncurry _prop, _prop2</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
               <p><strong>reduce</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {})</p>
 
             </div>
@@ -567,11 +584,11 @@ x.mapIndex = mapIndex = _maybeUncurry _mapIndex, _mapIndex2</pre></div></div>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p><strong>splitAt</strong> =&gt; Int -&gt; ([] -&gt; [[],[]])</p>
 
@@ -590,11 +607,11 @@ x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2</pre></div></div>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p><strong>splitHead</strong> =&gt; [a] -&gt; [a,[]]</p>
 
@@ -605,11 +622,11 @@ x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2</pre></div></div>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p><strong>tail</strong> =&gt; [] -&gt; []</p>
 
@@ -624,11 +641,11 @@ x.splitAt = splitAt = _maybeUncurry _splitAt, _splitAt2</pre></div></div>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p><strong>take</strong> =&gt; Int -&gt; ([] -&gt; {})</p>
 
@@ -646,11 +663,11 @@ x.take = take = _maybeUncurry _take, _take2</pre></div></div>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p><strong>traverseObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {})</p>
 <p>The first object function is executed before descending, the second operates
@@ -676,11 +693,11 @@ on the object resulting after descending</p>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p><strong>zipObj</strong> =&gt; [] -&gt; ([] -&gt; {})</p>
 
@@ -698,11 +715,11 @@ x.zipObj = zipObj = _maybeUncurry _zip, _zip2</pre></div></div>
         </li>
         
         
-        <li id="section-33">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p><strong>zipKeys</strong> =&gt; (String -&gt; a) -&gt; ([String] -&gt; {})</p>
 
@@ -724,11 +741,11 @@ defers.forEach (fcn) -&gt; fcn()</pre></div></div>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>Speed testing</p>
 
@@ -737,11 +754,11 @@ defers.forEach (fcn) -&gt; fcn()</pre></div></div>
         </li>
         
         
-        <li id="section-35">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>keys = [‘a’,’b’,’c’,’d’,’e’]
 vals = [1,2,3,4,5]
