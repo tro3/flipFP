@@ -178,7 +178,7 @@ x.drop = drop = _maybeUncurry _drop, _drop2
 
 
 #
-#**filter** => (a -> a) -> ([] -> [])
+#**filter** => (a -> Boolean) -> ([] -> [])
 #
 _filter = (fcn) ->
   (lst) ->
@@ -188,6 +188,19 @@ _filter = (fcn) ->
     r
 _filter2 = (n, lst) -> _filter(n)(lst)
 x.filter = filter = _maybeUncurry _filter, _filter2
+
+
+#
+#**filterIndex** => (a,i -> Boolean) -> ([] -> [])
+#
+_filterIndex = (fcn) ->
+  (lst) ->
+    r = []
+    for i in [0...lst.length]
+      r.push lst[i] if fcn lst[i], i
+    r
+_filterIndex2 = (n, lst) -> _filterIndex(n)(lst)
+x.filterIndex = filterIndex = _maybeUncurry _filterIndex, _filterIndex2
 
 
 #

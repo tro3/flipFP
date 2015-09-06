@@ -157,6 +157,16 @@ describe 'filter', ->
     assert.deepEqual (fp.filter testFn, [1,6,4,8,2]), [1,4,2]
 
 
+describe 'filterIndex', ->
+  it 'handles basic case', ->
+    testFn = fp.filterIndex (x, i) -> x < i
+    assert.deepEqual (testFn [2.0,2.1,2.2,2.3,2.4]), [2.3,2.4]
+
+  it 'handles noncurried case', ->
+    testFn = (x, i) -> x < i
+    assert.deepEqual (fp.filterIndex testFn, [2.0,2.1,2.2,2.3,2.4]), [2.3,2.4]
+
+
 describe 'flatten', ->
   it 'handles basic case', ->
     assert.deepEqual fp.flatten([[1,2],[3,4]]), [1,2,3,4]
