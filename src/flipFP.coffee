@@ -20,6 +20,21 @@ _maybeUncurry = (fn1, fn2) ->
 
 
 #
+#**_maybeCurry** => (* -> *) -> (* -> *)
+#
+# For one-param functions - Returns a curried function if passed
+# a function as an argument, and the executed function if passed values
+#
+_maybeCurry = (fn) ->
+  () ->
+    if arguments.length == 1 and typeof arguments[0] == 'function'
+      fn2 = arguments[0]
+      () -> fn(fn2.apply(null,arguments))
+    else
+      fn.apply(null,arguments)
+
+
+#
 #**all** => (a -> Boolean) -> ([a] -> Boolean)
 #
 _all = (fn) ->
@@ -178,14 +193,15 @@ x.filter = filter = _maybeUncurry _filter, _filter2
 #
 #**flatten** => [[]] -> []
 #
-x.flatten = flatten = (lst) ->
+_flatten = (lst) ->
   r = []
   for item in lst
     if item instanceof Array
-      subs = flatten item
+      subs = _flatten item
       r = r.concat subs
     else r.push item
   r
+x.flatten = flatten = _maybeCurry _flatten
 
 
 #

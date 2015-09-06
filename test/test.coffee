@@ -164,6 +164,10 @@ describe 'flatten', ->
   it 'handles nested case', ->
     assert.deepEqual fp.flatten([[1,2],[[3],[4]]]), [1,2,3,4]
 
+  it 'handles curried case', ->
+    testFn = (x,y) -> [[x,y],[[x+2],[y+2]]]
+    assert.deepEqual (fp.flatten testFn)(2,4), [2,4,4,6]
+
 
 describe 'keys', ->
   it 'handles handles basic case', ->
