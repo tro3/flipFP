@@ -89,9 +89,10 @@ x.allPass = allPass = maybePipe _allPass
 #
 #**always** => a -> (* -> a)
 #
-_always = (val) ->
+# Piping makes no sense
+#
+x.always = always = (val) ->
   () -> val
-x.always = always = maybePipeDirect _always
   
 
 #

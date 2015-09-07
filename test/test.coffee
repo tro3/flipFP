@@ -10,16 +10,16 @@ describe 'all', ->
     assert.isTrue testFn [6,7,8,9]
     assert.isFalse testFn [6,7,1,9]
 
-  it 'handles noncurried cases', ->
-    testFn = (x) -> x > 5
-    assert.isTrue fp.all testFn, [6,7,8,9]
-    assert.isFalse fp.all testFn, [6,7,1,9]
-
   it 'handles piped cases', ->
     genFn = (x) -> [6,7,x,9]
     testFn = fp.all ((x) -> x > 5), genFn
     assert.isTrue testFn 8
     assert.isFalse testFn 1
+
+  it 'handles noncurried cases', ->
+    testFn = (x) -> x > 5
+    assert.isTrue fp.all testFn, [6,7,8,9]
+    assert.isFalse fp.all testFn, [6,7,1,9]
 
 
 describe 'allPass', ->
@@ -31,6 +31,16 @@ describe 'allPass', ->
     assert.isTrue testFn 6
     assert.isFalse testFn 1
     assert.isFalse testFn 12
+
+  it 'handles piped cases', ->
+    genFn = (x) -> x*2
+    testFn = fp.allPass [
+      (x) -> x > 5
+      (x) -> x < 10
+    ], genFn
+    assert.isTrue testFn 3
+    assert.isFalse testFn 1
+    assert.isFalse testFn 6
 
   it 'handles noncurried cases', ->
     testFn = [
@@ -44,8 +54,8 @@ describe 'allPass', ->
 
 describe 'always', ->
   it 'handles basic case', ->
-    test = fp.always 1
-    assert.equal (test 6), 1
+    testFn = fp.always 1
+    assert.equal (testFn 6), 1
 
 
 describe 'any', ->
@@ -53,6 +63,12 @@ describe 'any', ->
     testFn = fp.any (x) -> x > 5
     assert.isTrue testFn [1,3,7,3]
     assert.isFalse testFn [2,3,1,4]
+
+  it 'handles piped cases', ->
+    genFn = (x) -> [x,x+1,x+2]
+    testFn = fp.any ((x) -> x > 5), genFn
+    assert.isTrue testFn 4
+    assert.isFalse testFn 2
 
   it 'handles noncurried cases', ->
     testFn = (x) -> x > 5
