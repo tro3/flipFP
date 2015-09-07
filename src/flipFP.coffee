@@ -35,15 +35,16 @@ x.maybePipe = maybePipe = (fcn) ->
       [args1, args2] = split arguments  
       fn1 = fcn.apply(null, args1)
       if args2.length == 1 and typeof args2[0] == 'function'
-        p 'piped'
         fn2 = args2[0]
-        () -> fn1(fn2.apply(null,arguments))
+        maybePipeDirect () -> fn1(fn2.apply(null,arguments))
       else
-        p 'direct'
         fn1.apply(null,args2)
     else
-      p 'static'
-      fcn.apply(null,arguments)
+      fcn2 = fcn.apply(null,arguments)
+      if fcn2.length == 1
+        maybePipeDirect fcn2
+      else
+        fcn2
 
 
 # Making up for the lack of export before maybePipe def'n
