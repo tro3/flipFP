@@ -35,11 +35,14 @@ x.maybePipe = maybePipe = (fcn) ->
       [args1, args2] = split arguments  
       fn1 = fcn.apply(null, args1)
       if args2.length == 1 and typeof args2[0] == 'function'
+        p 'piped'
         fn2 = args2[0]
         () -> fn1(fn2.apply(null,arguments))
       else
+        p 'direct'
         fn1.apply(null,args2)
     else
+      p 'static'
       fcn.apply(null,arguments)
 
 
@@ -58,10 +61,15 @@ x.splitAt = splitAt = maybePipe _splitAt
 x.maybePipeDirect = maybePipeDirect = (fcn) ->
   (val) ->
     if typeof val == 'function'
-      () -> fcn(val.apply(null,arguments))
+      if val.length == 1
+        maybePipeDirect(() -> fcn(val.apply(null,arguments)))
+      else
+        () -> fcn(val.apply(null,arguments))
     else
       fcn(val)
 
+#maybe f(x) -> f(y) if x is y
+#              f(f2(y)) x is f2
 
 
 #

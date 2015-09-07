@@ -402,8 +402,30 @@ describe 'zipKeys', ->
     assert.deepEqual (fp.zipKeys testFn, ['add', 'subtract']), {add:'A', subtract:'S'}
 
 
-describe 'natural piping', ->
+describe.only 'natural piping', ->
   it 'handles a basic case', ->
     testFn = fp.take 2, fp.map fp.prop 'a'
     assert.deepEqual testFn([{a:1,b:2}, {a:3,b:2}, {a:2,b:2}, {a:4,b:2}]), [1,3]
 
+  it 'handles double pipe', ->
+    add = fp.maybePipe ((i) -> (x) -> x + i)
+    add1 = add(1)
+    add2a = add(1) add1
+    add2b = add1 add(1)
+    add4a = add2a add2b
+    add4b = add2b add2a
+    assert.equal add1(1), 2
+    assert.equal add2a(1), 3
+    assert.equal add2b(1), 3
+    assert.equal add4a(1), 5
+    assert.equal add4b(1), 5
+
+  it 'handles direct double pipe', ->
+    add1 = fp.maybePipeDirect ((x) -> x + 1)
+    add2 = add1 add1
+    add4 = add2 add2
+    assert.equal add1(1), 2
+    assert.equal add2(1), 3
+    assert.equal add4(1), 5
+
+  it 'handles mixed double pipe'
