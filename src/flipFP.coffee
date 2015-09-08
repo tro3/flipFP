@@ -5,6 +5,9 @@ p = console.log
 defers = []
   
   
+# ## Normal Functions
+#
+#   Functions that do not operate on promises
 
 #
 #**splitAt** => Int -> ([] -> [[],[]])
@@ -169,25 +172,6 @@ x.compose = compose = () ->
 
 
 #
-#**composeP** => [(a -> a)] -> (a -> a)
-#
-# Can't be maybePipe'd due to unknown arg count
-#
-x.composeP = composeP = ->
-  _pipeP = (f1,f2) ->
-    () -> f1.apply(0, arguments).then (x) -> f2(x)
-  
-  fcns = []
-  for item in arguments
-    fcns.push item
-  fcns = fcns.reverse()
-  q = () -> fcns[0].apply(null, arguments)
-  for fcn in fcns[1..]
-    q = _pipeP(q, fcn)
-  q
-
-
-#
 #**concat** => []... -> []
 #
 # Can't be maybePipe'd due to unknown arg count
@@ -348,25 +332,6 @@ x.pipe = pipe = ->
 
 
 #
-#**pipeP** => [(a -> a)] -> (a -> a)
-#
-# Can't be maybePipe'd due to unknown arg count
-#
-x.pipeP = pipeP = ->
-  _pipeP = (f1,f2) ->
-    () -> f1.apply(null, arguments).then (x) -> f2(x)
-  
-  fcns = []
-  for item in arguments
-    fcns.push item
-  q = () -> fcns[0].apply(null, arguments)
-  for fcn in fcns[1..]
-    q = _pipeP(q, fcn)
-  q
-
-
-
-#
 #**prop** => String -> ({} -> a)
 #
 _prop = (key) -> (obj) -> obj[key]
@@ -473,6 +438,48 @@ _zipKeys = (fcn) ->
     r
 x.zipKeys = zipKeys = maybePipe _zipKeys
 
+
+# ## Q Functions
+#  Functions that operate on promises
+
+#
+#**qCompose** => [(a -> Q a)] -> (a -> Q a)
+#
+# Can't be maybePipe'd due to unknown arg count
+#
+x.qCompose = qCompose = ->
+  _qPipe = (f1,f2) ->
+    () -> f1.apply(0, arguments).then (x) -> f2(x)
+  
+  fcns = []
+  for item in arguments
+    fcns.push item
+  fcns = fcns.reverse()
+  q = () -> fcns[0].apply(null, arguments)
+  for fcn in fcns[1..]
+    q = _qPipe(q, fcn)
+  q
+
+
+
+#
+#**qPipe** => [(a -> Q a)] -> (a -> Q a)
+#
+# Can't be maybePipe'd due to unknown arg count
+#
+x.qPipe = qPipe = ->
+  _qPipe = (f1,f2) ->
+    () -> f1.apply(null, arguments).then (x) -> f2(x)
+  
+  fcns = []
+  for item in arguments
+    fcns.push item
+  q = () -> fcns[0].apply(null, arguments)
+  for fcn in fcns[1..]
+    q = _qPipe(q, fcn)
+  q
+  
+  
 
 
 defers.forEach (fcn) -> fcn()

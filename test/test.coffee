@@ -154,23 +154,6 @@ describe 'tmp', ->
       assert.deepEqual fn(3, 1), 3
   
   
-  describe 'composeP', ->
-    it 'handles direct case', ->
-      fn1 = (x, y) ->  promise(x+2+y)
-      fn2 = (x) ->     promise(x/2)
-      fn3 = (x) ->     promise(x+1)
-      (fp.composeP fn3, fn2, fn1)(3,1).then (val) ->      
-        assert.deepEqual val, 4
-
-    it 'handles compiled case', ->
-      fn1 = (x, y) ->  promise(x+2+y)
-      fn2 = (x) ->     promise(x/2)
-      fn3 = (x) ->     promise(x+1)
-      testFn = fp.composeP fn3, fn2, fn1
-      testFn(3,1).then (val) ->      
-        assert.deepEqual val, 4
-  
-  
   describe 'concat', ->
     it 'handles basic case', ->
       assert.deepEqual fp.concat([1], [2,3], [4]), [1,2,3,4]
@@ -287,27 +270,6 @@ describe 'tmp', ->
       fn2 = (x) -> x/2
       fn = fp.pipe fn1, fn2
       assert.deepEqual fn(3, 1), 3
-
-
-describe 'pipeP', ->
-  it 'handles direct case', (done) ->
-    fn1 = (x, y) ->  promise(x+2+y)
-    fn2 = (x) ->     promise(x/2)
-    fn3 = (x) ->     promise(x+1)
-      
-    (fp.pipeP fn1, fn2, fn3)(3,1).then (val) ->
-      assert.deepEqual val, 4
-      done()
-
-  it 'handles compiled case', (done) ->
-    fn1 = (x, y) ->  promise(x+2+y)
-    fn2 = (x) ->     promise(x/2)
-    fn3 = (x) ->     promise(x+1)
-      
-    testFn = fp.pipeP fn1, fn2, fn3
-    testFn(3,1).then (val) ->      
-      assert.deepEqual val, 4
-      done()
 
 
 describe 'prop', ->
@@ -445,3 +407,44 @@ describe 'natural piping', ->
     assert.equal add2c(1), 3
     assert.equal add4a(1), 5
     assert.equal add4b(1), 5
+
+
+
+
+  describe 'qCompose', ->
+    it 'handles direct case', ->
+      fn1 = (x, y) ->  promise(x+2+y)
+      fn2 = (x) ->     promise(x/2)
+      fn3 = (x) ->     promise(x+1)
+      (fp.qCompose fn3, fn2, fn1)(3,1).then (val) ->      
+        assert.deepEqual val, 4
+
+    it 'handles compiled case', ->
+      fn1 = (x, y) ->  promise(x+2+y)
+      fn2 = (x) ->     promise(x/2)
+      fn3 = (x) ->     promise(x+1)
+      testFn = fp.qCompose fn3, fn2, fn1
+      testFn(3,1).then (val) ->      
+        assert.deepEqual val, 4
+  
+  
+
+describe 'qPipe', ->
+  it 'handles direct case', (done) ->
+    fn1 = (x, y) ->  promise(x+2+y)
+    fn2 = (x) ->     promise(x/2)
+    fn3 = (x) ->     promise(x+1)
+      
+    (fp.qPipe fn1, fn2, fn3)(3,1).then (val) ->
+      assert.deepEqual val, 4
+      done()
+
+  it 'handles compiled case', (done) ->
+    fn1 = (x, y) ->  promise(x+2+y)
+    fn2 = (x) ->     promise(x/2)
+    fn3 = (x) ->     promise(x+1)
+      
+    testFn = fp.qPipe fn1, fn2, fn3
+    testFn(3,1).then (val) ->      
+      assert.deepEqual val, 4
+      done()
