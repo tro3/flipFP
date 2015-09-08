@@ -181,8 +181,10 @@ x.composeP = composeP = ->
   for item in arguments
     fcns.push item
   fcns = fcns.reverse()
-  q = fcns[0].apply(0, arguments)
-  reduce(_pipeP, q, fcns[1..])
+  q = () -> fcns[0].apply(null, arguments)
+  for fcn in fcns[1..]
+    q = _pipeP(q, fcn)
+  q
 
 
 #
@@ -352,13 +354,16 @@ x.pipe = pipe = ->
 #
 x.pipeP = pipeP = ->
   _pipeP = (f1,f2) ->
-    () -> f1.apply(0, arguments).then (x) -> f2(x)
+    () -> f1.apply(null, arguments).then (x) -> f2(x)
   
   fcns = []
   for item in arguments
     fcns.push item
-  q = fcns[0].apply(0, arguments)
-  reduce(_pipeP, q, fcns[1..])
+  q = () -> fcns[0].apply(null, arguments)
+  for fcn in fcns[1..]
+    q = _pipeP(q, fcn)
+  q
+
 
 
 #
@@ -369,7 +374,7 @@ x.prop = prop = maybePipe _prop
 
 
 #
-#**reduce** => (a -> a) -> ({} -> {})
+#**reduce** => (b,a -> b) -> b -> ([a] -> b)
 #
 x.reduce = reduce = () ->
   _reduce = (fcn, init, lst) ->

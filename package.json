@@ -19,6 +19,9 @@
     "url": "https://github.com/tro3/flipFP/issues"
   },
   "homepage": "https://github.com/tro3/flipFP#readme",
+  "dependencies": {
+    "q": "^1.4.1"
+  },
   "devDependencies": {
     "chai": "^3.2.0",
     "docco": "^0.7.0",
