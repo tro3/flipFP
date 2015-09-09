@@ -3,7 +3,46 @@ x = module.exports
 p = console.log
 
 defers = []
+
+#
+# Given a unary function f(x):
+#
+# It can be passed three things:
+#
+#   1. A value
+#   2. A promise
+#   3. Another function (which may return a value or a promise)
+#
+# Execute and pipe wrappers:
+#
+#   f'(x) = | x is value -> f(x)
+#           | x is promise -> x.then((val) -> f(val))
+#
+#   f''(x) = | x is function g(y) -> h(y) = f'(g(y))
+#            | otherwise f'(x)
+
+
   
+  
+  
+# Internal piping functions
+#
+# Note that f1 is assumed to occur *before* f2
+#
+
+_isPromise = (x) -> x != null and typeof x == 'object' && 'then' of x
+
+_pipe = (f1,f2) ->
+  () ->
+    x1 = f1.apply(null, arguments)
+    if _isPromise x1
+      x1.then (x2) -> f2(x2)
+    else
+      f2(x1)
+
+_qPipe = (f1,f2) ->
+  () -> f1.apply(null, arguments).then (x) -> f2(x)
+
   
 # ## Normal Functions
 #
@@ -20,6 +59,9 @@ _splitAt = (n) ->
       if i < n then r1.push lst[i] else r2.push lst[i]
     [r1,r2]
 
+
+# Remove the debug functions once stable
+debug = false
 
 #
 #**maybePipe** => (* -> *) -> (* -> *) or a
@@ -39,14 +81,21 @@ x.maybePipe = maybePipe = (fcn) ->
       fn1 = fcn.apply(null, args1)
       if args2.length == 1 and typeof args2[0] == 'function'
         fn2 = args2[0]
-        maybePipeDirect () -> fn1(fn2.apply(null,arguments))
+        p 'piped and conditional' if debug
+        maybePipeDirect _pipe(fn2,fn1)
+      else if args2.length == 1 and _isPromise args2[0]
+        p 'direct q' if debug
+        args2[0].then (x) -> fn1(x)
       else
+        p 'direct' if debug
         fn1.apply(null,args2)
     else
       fcn2 = fcn.apply(null,arguments)
       if fcn2.length == 1
+        p 'conditional' if debug
         maybePipeDirect fcn2
       else
+        p 'static' if debug
         fcn2
 
 
@@ -66,14 +115,17 @@ x.maybePipeDirect = maybePipeDirect = (fcn) ->
   (val) ->
     if typeof val == 'function'
       if val.length == 1
-        maybePipeDirect(() -> fcn(val.apply(null,arguments)))
+        p 'single piped and conditional' if debug
+        maybePipeDirect _pipe(val,fcn)
       else
-        () -> fcn(val.apply(null,arguments))
+        p 'single piped' if debug
+        _pipe(val,fcn)
+    else if _isPromise val
+      p 'single direct q' if debug
+      val.then (x) -> fcn(x)
     else
+      p 'single direct' if debug
       fcn(val)
-
-#maybe f(x) -> f(y) if x is y
-#              f(f2(y)) x is f2
 
 
 #
@@ -442,6 +494,28 @@ x.zipKeys = zipKeys = maybePipe _zipKeys
 # ## Q Functions
 #  Functions that operate on promises
 
+
+#
+#**maybeqQPipeDirect** => (* -> *) -> (* -> *) or a
+#
+# Returns the executed original function if passed a value
+# as an argument.  If passed a function, it will
+# be piped to the original function.  Only works for
+# single-argument functions
+#
+x.maybeQPipeDirect = maybeQPipeDirect = (fcn) ->
+  (val) ->
+    if typeof val == 'function'
+      if val.length == 1
+        maybePipeDirect () ->
+          fcn.apply(null, arguments)
+          .then (x) -> val(x)
+      else
+        () -> fcn(val.apply(null,arguments))
+    else
+      fcn(val)
+      
+
 #
 #**qCompose** => [(a -> Q a)] -> (a -> Q a)
 #
@@ -449,7 +523,7 @@ x.zipKeys = zipKeys = maybePipe _zipKeys
 #
 x.qCompose = qCompose = ->
   _qPipe = (f1,f2) ->
-    () -> f1.apply(0, arguments).then (x) -> f2(x)
+    () -> f1.apply(null, arguments).then (x) -> f2(x)
   
   fcns = []
   for item in arguments

@@ -5,271 +5,264 @@ p = console.log
 fp = require '../src/flipFP'
 
 
-#  class mockPromise
-#    constructor: (cb) ->
-#      @thenCB = null
-#      setTimeout 1, -> cb(@resolve)
-#    resolve: (val) ->
-#      @thenCB(val)
-#    then: (cb) ->
-#      @thenCB = cb
-#      
+    
 promise = (val) ->
   q.Promise (resolve, reject) ->
     setTimeout (-> resolve(val)),1
-  
-describe 'tmp', ->  
-  describe 'all', ->
-    it 'handles basic cases', ->
-      testFn = fp.all (x) -> x > 5
-      assert.isTrue testFn [6,7,8,9]
-      assert.isFalse testFn [6,7,1,9]
-  
-    it 'handles piped cases', ->
-      genFn = (x) -> [6,7,x,9]
-      testFn = fp.all ((x) -> x > 5), genFn
-      assert.isTrue testFn 8
-      assert.isFalse testFn 1
-  
-    it 'handles noncurried cases', ->
-      testFn = (x) -> x > 5
-      assert.isTrue fp.all testFn, [6,7,8,9]
-      assert.isFalse fp.all testFn, [6,7,1,9]
-  
-  
-  describe 'allPass', ->
-    it 'handles basic cases', ->
-      testFn = fp.allPass [
-        (x) -> x > 5
-        (x) -> x < 10
-      ]
-      assert.isTrue testFn 6
-      assert.isFalse testFn 1
-      assert.isFalse testFn 12
-  
-    it 'handles piped cases', ->
-      genFn = (x) -> x*2
-      testFn = fp.allPass [
-        (x) -> x > 5
-        (x) -> x < 10
-      ], genFn
-      assert.isTrue testFn 3
-      assert.isFalse testFn 1
-      assert.isFalse testFn 6
-  
-    it 'handles noncurried cases', ->
-      testFn = [
-        (x) -> x > 5
-        (x) -> x < 10
-      ]
-      assert.isTrue fp.allPass testFn, 6
-      assert.isFalse fp.allPass testFn, 1
-      assert.isFalse fp.allPass testFn, 12
-  
-  
-  describe 'always', ->
-    it 'handles basic case', ->
-      testFn = fp.always 1
-      assert.equal (testFn 6), 1
-  
-  
-  describe 'any', ->
-    it 'handles basic cases', ->
-      testFn = fp.any (x) -> x > 5
-      assert.isTrue testFn [1,3,7,3]
-      assert.isFalse testFn [2,3,1,4]
-  
-    it 'handles piped cases', ->
-      genFn = (x) -> [x,x+1,x+2]
-      testFn = fp.any ((x) -> x > 5), genFn
-      assert.isTrue testFn 4
-      assert.isFalse testFn 2
-  
-    it 'handles noncurried cases', ->
-      testFn = (x) -> x > 5
-      assert.isTrue fp.any testFn, [1,3,7,3]
-      assert.isFalse fp.any testFn, [2,3,1,4]
-  
-  
-  describe 'anyPass', ->
-    it 'handles basic cases', ->
-      testFn = fp.anyPass [
-        (x) -> x > 10
-        (x) -> x < 5
-      ]
-      assert.isTrue testFn 3
-      assert.isTrue testFn 12
-      assert.isFalse testFn 8    
-  
-    it 'handles noncurried cases', ->
-      testFn = [
-        (x) -> x > 10
-        (x) -> x < 5
-      ]
-      assert.isTrue fp.anyPass testFn, 3
-      assert.isTrue fp.anyPass testFn, 12
-      assert.isFalse fp.anyPass testFn, 8    
-  
-  
-  describe 'callAll', ->
-    it 'handles basic case', ->
-      testFn = fp.callAll [
-        (x) -> x + 1
-        (x) -> x - 2
-      ]
-      assert.deepEqual (testFn 8), [9, 6]    
-  
-    it 'handles noncurried case', ->
-      testFns = [
-        (x) -> x + 1
-        (x) -> x - 2
-      ]
-      assert.deepEqual fp.callAll(testFns, 8), [9, 6]    
-  
-  
-  describe 'chain', ->
-    it 'handles basic case', ->
-      testFn = fp.chain (x) -> [x,x]
-      assert.deepEqual testFn([1,2]), [1,1,2,2]
-  
-  
-  describe 'clone', ->
-    it 'handles basic case', ->
-      val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
-      assert.deepEqual fp.clone(val), val
-      assert.isFalse fp.clone(val) == val
-  
-  
-  describe 'compose', ->
-    it 'handles basic case', ->
-      fn1 = (x) -> x+2
-      fn2 = (x) -> x/2
-      fn = fp.map (fp.compose fn2, fn1)
-      assert.deepEqual (fn [2,4,6]), [2,3,4]
-  
-    it 'handles mutiple args of first function', ->
-      fn1 = (x, y) -> x+2 + y
-      fn2 = (x) -> x/2
-      fn = fp.compose fn2, fn1
-      assert.deepEqual fn(3, 1), 3
-  
-  
-  describe 'concat', ->
-    it 'handles basic case', ->
-      assert.deepEqual fp.concat([1], [2,3], [4]), [1,2,3,4]
-  
-    it 'handles non-Array case', ->
-      assert.deepEqual fp.concat(1, [2,3], 4), [1,2,3,4]
-  
-  
-  describe 'filter', ->
-    it 'handles basic case', ->
-      testFn = fp.filter (x) -> x < 5
-      assert.deepEqual (testFn [1,6,4,8,2]), [1,4,2]
-  
-    it 'handles noncurried case', ->
-      testFn = (x) -> x < 5
-      assert.deepEqual (fp.filter testFn, [1,6,4,8,2]), [1,4,2]
-  
-  
-  describe 'filterIndex', ->
-    it 'handles basic case', ->
-      testFn = fp.filterIndex (x, i) -> x < i
-      assert.deepEqual (testFn [2.0,2.1,2.2,2.3,2.4]), [2.3,2.4]
-  
-    it 'handles noncurried case', ->
-      testFn = (x, i) -> x < i
-      assert.deepEqual (fp.filterIndex testFn, [2.0,2.1,2.2,2.3,2.4]), [2.3,2.4]
-  
-  
-  describe 'flatten', ->
-    it 'handles basic case', ->
-      assert.deepEqual fp.flatten([[1,2],[3,4]]), [1,2,3,4]
-  
-    it 'handles nested case', ->
-      assert.deepEqual fp.flatten([[1,2],[[3],[4]]]), [1,2,3,4]
-  
-    it 'handles curried case', ->
-      testFn = (x,y) -> [[x,y],[[x+2],[y+2]]]
-      assert.deepEqual (fp.flatten testFn)(2,4), [2,4,4,6]
-  
-  
-  describe 'keys', ->
-    it 'handles handles basic case', ->
-      val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
-      assert.sameMembers fp.keys(val), ['a','b','d','f']
-  
-  
-  describe 'id', ->
-    it 'handles handles basic case', ->
-      val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
-      assert.equal fp.id(val), val
-  
-  
-  describe 'isNothing', ->
-    it 'handles handles basic cases', ->
-      assert.isTrue fp.isNothing(null), 'null'
-      assert.isTrue fp.isNothing(undefined), 'undefined'
-      assert.isTrue fp.isNothing(''), 'empty string'
-      assert.isTrue fp.isNothing(' '), 'whitespace string'
-      assert.isTrue fp.isNothing([]), 'empty array'
-      assert.isTrue fp.isNothing({}), 'empty object'
-      assert.isFalse fp.isNothing(0), 'zero'
-      assert.isFalse fp.isNothing(false), 'false'
-  
-    it 'handles handles curried cases', ->
-      testFn = fp.isNothing (x,y) -> if x == 1 then [] else [x+y]
-      assert.isTrue testFn(1,2)
-      assert.isFalse testFn(2,3)
-      
-  
-  
-  describe 'map', ->
-    it 'handles list of primitives', ->
-      fn = fp.map (x) -> x+1
-      assert.deepEqual (fn [1,2,3]), [2,3,4]
-  
-    it 'handles list of objects', ->      
-      fn = fp.map (x) -> x._id += 1; x
-      assert.deepEqual (fn [{_id:1}, {_id:2}]), [{_id:2}, {_id:3}]
-  
-    it 'handles uncurried case', ->
-      fn = (x) -> x+1
-      assert.deepEqual (fp.map fn, [1,2,3]), [2,3,4]
-  
-  
-  describe 'mapIndex', ->
-    it 'handles list of primitives', ->
-      fn = fp.mapIndex (x, i) -> i
-      assert.deepEqual (fn [1,2,3]), [0,1,2]
-  
-    it 'handles list of objects', ->      
-      fn = fp.mapIndex (x, i) -> {a:x._id, b:i}
-      assert.deepEqual (fn [{_id:1}, {_id:2}]), [{a:1, b:0}, {a:2, b:1}]
-  
-    it 'handles uncurried case', ->
-      fn = (x, i) -> i+1
-      assert.deepEqual (fp.mapIndex fn, [3,2,1]), [1,2,3]
-  
-  
-  describe 'mapObj', ->
-    it 'handles basic case', ->
-      fn = fp.mapObj (x) -> x+1
-      assert.deepEqual (fn {a:1, b:1}), {a:2, b:2}
-  
-  
-  describe 'pipe', ->
-    it 'handles basic case', ->
-      fn1 = (x) -> x+2
-      fn2 = (x) -> x/2
-      fn = fp.map (fp.pipe fn1, fn2)
-      assert.deepEqual (fn [2,4,6]), [2,3,4]
-  
-    it 'handles mutiple args of first function', ->
-      fn1 = (x, y) -> x+2 + y
-      fn2 = (x) -> x/2
-      fn = fp.pipe fn1, fn2
-      assert.deepEqual fn(3, 1), 3
+    
+    
+    
+describe 'all', ->
+  it 'handles basic cases', ->
+    testFn = fp.all (x) -> x > 5
+    assert.isTrue testFn [6,7,8,9]
+    assert.isFalse testFn [6,7,1,9]
+
+  it 'handles piped cases', ->
+    genFn = (x) -> [6,7,x,9]
+    testFn = fp.all ((x) -> x > 5), genFn
+    assert.isTrue testFn 8
+    assert.isFalse testFn 1
+
+  it 'handles noncurried cases', ->
+    testFn = (x) -> x > 5
+    assert.isTrue fp.all testFn, [6,7,8,9]
+    assert.isFalse fp.all testFn, [6,7,1,9]
+
+
+describe 'allPass', ->
+  it 'handles basic cases', ->
+    testFn = fp.allPass [
+      (x) -> x > 5
+      (x) -> x < 10
+    ]
+    assert.isTrue testFn 6
+    assert.isFalse testFn 1
+    assert.isFalse testFn 12
+
+  it 'handles piped cases', ->
+    genFn = (x) -> x*2
+    testFn = fp.allPass [
+      (x) -> x > 5
+      (x) -> x < 10
+    ], genFn
+    assert.isTrue testFn 3
+    assert.isFalse testFn 1
+    assert.isFalse testFn 6
+
+  it 'handles noncurried cases', ->
+    testFn = [
+      (x) -> x > 5
+      (x) -> x < 10
+    ]
+    assert.isTrue fp.allPass testFn, 6
+    assert.isFalse fp.allPass testFn, 1
+    assert.isFalse fp.allPass testFn, 12
+
+
+describe 'always', ->
+  it 'handles basic case', ->
+    testFn = fp.always 1
+    assert.equal (testFn 6), 1
+
+
+describe 'any', ->
+  it 'handles basic cases', ->
+    testFn = fp.any (x) -> x > 5
+    assert.isTrue testFn [1,3,7,3]
+    assert.isFalse testFn [2,3,1,4]
+
+  it 'handles piped cases', ->
+    genFn = (x) -> [x,x+1,x+2]
+    testFn = fp.any ((x) -> x > 5), genFn
+    assert.isTrue testFn 4
+    assert.isFalse testFn 2
+
+  it 'handles noncurried cases', ->
+    testFn = (x) -> x > 5
+    assert.isTrue fp.any testFn, [1,3,7,3]
+    assert.isFalse fp.any testFn, [2,3,1,4]
+
+
+describe 'anyPass', ->
+  it 'handles basic cases', ->
+    testFn = fp.anyPass [
+      (x) -> x > 10
+      (x) -> x < 5
+    ]
+    assert.isTrue testFn 3
+    assert.isTrue testFn 12
+    assert.isFalse testFn 8    
+
+  it 'handles noncurried cases', ->
+    testFn = [
+      (x) -> x > 10
+      (x) -> x < 5
+    ]
+    assert.isTrue fp.anyPass testFn, 3
+    assert.isTrue fp.anyPass testFn, 12
+    assert.isFalse fp.anyPass testFn, 8    
+
+
+describe 'callAll', ->
+  it 'handles basic case', ->
+    testFn = fp.callAll [
+      (x) -> x + 1
+      (x) -> x - 2
+    ]
+    assert.deepEqual (testFn 8), [9, 6]    
+
+  it 'handles noncurried case', ->
+    testFns = [
+      (x) -> x + 1
+      (x) -> x - 2
+    ]
+    assert.deepEqual fp.callAll(testFns, 8), [9, 6]    
+
+
+describe 'chain', ->
+  it 'handles basic case', ->
+    testFn = fp.chain (x) -> [x,x]
+    assert.deepEqual testFn([1,2]), [1,1,2,2]
+
+
+describe 'clone', ->
+  it 'handles basic case', ->
+    val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
+    assert.deepEqual fp.clone(val), val
+    assert.isFalse fp.clone(val) == val
+
+
+describe 'compose', ->
+  it 'handles basic case', ->
+    fn1 = (x) -> x+2
+    fn2 = (x) -> x/2
+    fn = fp.map (fp.compose fn2, fn1)
+    assert.deepEqual (fn [2,4,6]), [2,3,4]
+
+  it 'handles mutiple args of first function', ->
+    fn1 = (x, y) -> x+2 + y
+    fn2 = (x) -> x/2
+    fn = fp.compose fn2, fn1
+    assert.deepEqual fn(3, 1), 3
+
+
+describe 'concat', ->
+  it 'handles basic case', ->
+    assert.deepEqual fp.concat([1], [2,3], [4]), [1,2,3,4]
+
+  it 'handles non-Array case', ->
+    assert.deepEqual fp.concat(1, [2,3], 4), [1,2,3,4]
+
+
+describe 'filter', ->
+  it 'handles basic case', ->
+    testFn = fp.filter (x) -> x < 5
+    assert.deepEqual (testFn [1,6,4,8,2]), [1,4,2]
+
+  it 'handles noncurried case', ->
+    testFn = (x) -> x < 5
+    assert.deepEqual (fp.filter testFn, [1,6,4,8,2]), [1,4,2]
+
+
+describe 'filterIndex', ->
+  it 'handles basic case', ->
+    testFn = fp.filterIndex (x, i) -> x < i
+    assert.deepEqual (testFn [2.0,2.1,2.2,2.3,2.4]), [2.3,2.4]
+
+  it 'handles noncurried case', ->
+    testFn = (x, i) -> x < i
+    assert.deepEqual (fp.filterIndex testFn, [2.0,2.1,2.2,2.3,2.4]), [2.3,2.4]
+
+
+describe 'flatten', ->
+  it 'handles basic case', ->
+    assert.deepEqual fp.flatten([[1,2],[3,4]]), [1,2,3,4]
+
+  it 'handles nested case', ->
+    assert.deepEqual fp.flatten([[1,2],[[3],[4]]]), [1,2,3,4]
+
+  it 'handles curried case', ->
+    testFn = (x,y) -> [[x,y],[[x+2],[y+2]]]
+    assert.deepEqual (fp.flatten testFn)(2,4), [2,4,4,6]
+
+
+describe 'keys', ->
+  it 'handles handles basic case', ->
+    val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
+    assert.sameMembers fp.keys(val), ['a','b','d','f']
+
+
+describe 'id', ->
+  it 'handles handles basic case', ->
+    val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
+    assert.equal fp.id(val), val
+
+
+describe 'isNothing', ->
+  it 'handles handles basic cases', ->
+    assert.isTrue fp.isNothing(null), 'null'
+    assert.isTrue fp.isNothing(undefined), 'undefined'
+    assert.isTrue fp.isNothing(''), 'empty string'
+    assert.isTrue fp.isNothing(' '), 'whitespace string'
+    assert.isTrue fp.isNothing([]), 'empty array'
+    assert.isTrue fp.isNothing({}), 'empty object'
+    assert.isFalse fp.isNothing(0), 'zero'
+    assert.isFalse fp.isNothing(false), 'false'
+
+  it 'handles handles curried cases', ->
+    testFn = fp.isNothing (x,y) -> if x == 1 then [] else [x+y]
+    assert.isTrue testFn(1,2)
+    assert.isFalse testFn(2,3)
+    
+
+
+describe 'map', ->
+  it 'handles list of primitives', ->
+    fn = fp.map (x) -> x+1
+    assert.deepEqual (fn [1,2,3]), [2,3,4]
+
+  it 'handles list of objects', ->      
+    fn = fp.map (x) -> x._id += 1; x
+    assert.deepEqual (fn [{_id:1}, {_id:2}]), [{_id:2}, {_id:3}]
+
+  it 'handles uncurried case', ->
+    fn = (x) -> x+1
+    assert.deepEqual (fp.map fn, [1,2,3]), [2,3,4]
+
+
+describe 'mapIndex', ->
+  it 'handles list of primitives', ->
+    fn = fp.mapIndex (x, i) -> i
+    assert.deepEqual (fn [1,2,3]), [0,1,2]
+
+  it 'handles list of objects', ->      
+    fn = fp.mapIndex (x, i) -> {a:x._id, b:i}
+    assert.deepEqual (fn [{_id:1}, {_id:2}]), [{a:1, b:0}, {a:2, b:1}]
+
+  it 'handles uncurried case', ->
+    fn = (x, i) -> i+1
+    assert.deepEqual (fp.mapIndex fn, [3,2,1]), [1,2,3]
+
+
+describe 'mapObj', ->
+  it 'handles basic case', ->
+    fn = fp.mapObj (x) -> x+1
+    assert.deepEqual (fn {a:1, b:1}), {a:2, b:2}
+
+
+describe 'pipe', ->
+  it 'handles basic case', ->
+    fn1 = (x) -> x+2
+    fn2 = (x) -> x/2
+    fn = fp.map (fp.pipe fn1, fn2)
+    assert.deepEqual (fn [2,4,6]), [2,3,4]
+
+  it 'handles mutiple args of first function', ->
+    fn1 = (x, y) -> x+2 + y
+    fn2 = (x) -> x/2
+    fn = fp.pipe fn1, fn2
+    assert.deepEqual fn(3, 1), 3
 
 
 describe 'prop', ->
@@ -409,23 +402,69 @@ describe 'natural piping', ->
     assert.equal add4b(1), 5
 
 
+describe 'natural q piping', ->
+  it 'handles q compile-piped to normal function', (done) ->
+    f = -> promise([1,2,3,4,5])
+    filt = (x) -> x > 3
+    testFn = fp.filter filt, f
+    testFn()
+    .then (vals) ->
+      assert.deepEqual vals, [4,5]
+      done()
+    #p 'done compiling'
+
+  it 'handles q direct-piped to normal function', (done) ->
+    f = -> promise([1,2,3,4,5])
+    filt = (x) -> x > 3
+    fp.filter filt, f()
+    .then (vals) ->
+      assert.deepEqual vals, [4,5]
+      done()
+    #p 'done compiling'
+
+  it 'handles a stack of normal functions after q', (done) ->
+    f = -> promise([1,2,3,4,5])
+    filt = (x) -> x > 3
+    mapf = (x) -> x + 2
+    testFn = fp.map mapf, (fp.filter filt)
+    testFn f()
+    .then (vals) ->
+      assert.deepEqual vals, [6,7]
+      done()
+    #p 'done compiling'
 
 
-  describe 'qCompose', ->
-    it 'handles direct case', ->
-      fn1 = (x, y) ->  promise(x+2+y)
-      fn2 = (x) ->     promise(x/2)
-      fn3 = (x) ->     promise(x+1)
-      (fp.qCompose fn3, fn2, fn1)(3,1).then (val) ->      
-        assert.deepEqual val, 4
+#describe 'natural q piping', ->
+#  it 'handles direct double pipe', (done) ->
+#    add1 = fp.maybeQPipeDirect (x) -> promise(x + 1)
+#    add2 = add1 add1
+#    add4 = add2 add2
+#    add1(1)
+#    .then (val) -> assert.equal val, 2
+#    .then -> add2(1)
+#    .then (val) -> assert.equal val, 3
+#    .then -> add4(1)
+#    .then (val) -> assert.equal val, 5
+#    .then -> done()
+#    .catch (err) -> done(err)
 
-    it 'handles compiled case', ->
-      fn1 = (x, y) ->  promise(x+2+y)
-      fn2 = (x) ->     promise(x/2)
-      fn3 = (x) ->     promise(x+1)
-      testFn = fp.qCompose fn3, fn2, fn1
-      testFn(3,1).then (val) ->      
-        assert.deepEqual val, 4
+
+
+describe 'qCompose', ->
+  it 'handles direct case', ->
+    fn1 = (x, y) ->  promise(x+2+y)
+    fn2 = (x) ->     promise(x/2)
+    fn3 = (x) ->     promise(x+1)
+    (fp.qCompose fn3, fn2, fn1)(3,1).then (val) ->      
+      assert.deepEqual val, 4
+
+  it 'handles compiled case', ->
+    fn1 = (x, y) ->  promise(x+2+y)
+    fn2 = (x) ->     promise(x/2)
+    fn3 = (x) ->     promise(x+1)
+    testFn = fp.qCompose fn3, fn2, fn1
+    testFn(3,1).then (val) ->      
+      assert.deepEqual val, 4
   
   
 
