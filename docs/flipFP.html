@@ -45,10 +45,33 @@ defers = []</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <h2 id="normal-functions">Normal Functions</h2>
-<p>  Functions that do not operate on promises</p>
+              <p>Given a unary function f(x):</p>
+<p>It can be passed one of three things:</p>
+<ol>
+<li>A value</li>
+<li>A promise</li>
+<li>Another function (which may return a value or a promise)</li>
+</ol>
+<p>Execute and pipe wrappers:</p>
+<p>  f’(x) = | x is value -&gt; f(x)
+          | x is promise -&gt; x.then((val) -&gt; f(val))</p>
+<p>  With f’ we know we are executing</p>
+<p>  f’’(x) = | x is function g(y) -&gt; h(y) = f’(g(y))
+           | otherwise f’(x)</p>
+<p>  With f’’ we may be compiling</p>
+<p>Given a function <em>generator</em> F(a,b,…) that generates a unary function f(x)</p>
+<p>It can be passed two quantities of parameters</p>
+<p>  a. The correct amount
+  b. The correct amount + 1, intending to execute the generated function</p>
+<p>  F’(a,b,…) = F(a,b,…)’’ = f’’
+  F’(a,b,…,x) = F(a,b,…)’’(x) = f’’(x)</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">
+
+<span class="hljs-title">_isFunction</span> = <span class="hljs-params">(x)</span> -&gt;</span> <span class="hljs-keyword">typeof</span> x == <span class="hljs-string">'function'</span>
+<span class="hljs-function"><span class="hljs-title">_isPromise</span> = <span class="hljs-params">(x)</span> -&gt;</span> x != <span class="hljs-literal">null</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> x == <span class="hljs-string">'object'</span> &amp;&amp; <span class="hljs-string">'then'</span> <span class="hljs-keyword">of</span> x</pre></div></div>
             
         </li>
         
@@ -59,17 +82,14 @@ defers = []</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p><strong>splitAt</strong> =&gt; Int -&gt; ([] -&gt; [[],[]])</p>
+              <p>f’</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_splitAt</span> = <span class="hljs-params">(n)</span> -&gt;</span>
-  (lst) -&gt;
-    r1 = []
-    r2 = []
-    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..lst.length]
-      <span class="hljs-keyword">if</span> i &lt; n <span class="hljs-keyword">then</span> r1.push lst[i] <span class="hljs-keyword">else</span> r2.push lst[i]
-    [r1,r2]</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_execWrap</span> = <span class="hljs-params">(f)</span> -&gt;</span>
+  (x) -&gt;
+    <span class="hljs-keyword">if</span> _isPromise x <span class="hljs-keyword">then</span> x.<span class="hljs-keyword">then</span>(<span class="hljs-function"><span class="hljs-params">(y)</span> -&gt;</span> f(y))          <span class="hljs-comment"># exec promise</span>
+    <span class="hljs-keyword">else</span>                 f(x)                         <span class="hljs-comment"># exec primitive</span></pre></div></div>
             
         </li>
         
@@ -80,33 +100,19 @@ defers = []</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p><strong>maybePipe</strong> =&gt; (<em> -&gt; </em>) -&gt; (<em> -&gt; </em>) or a</p>
-<p>Returns the original function generator if passed the proper
-amount of parameters, and if passed more will returned the
-executed function unless there is only on extra param and a
-function is passed.  In that case, the fucnction passed will
-be piped to the generated function.</p>
+              <p>f’’</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>x.maybePipe = maybePipe = <span class="hljs-function"><span class="hljs-params">(fcn)</span> -&gt;</span>
-  n = fcn.length
-  split = _splitAt n
-  () -&gt;
-    <span class="hljs-keyword">if</span> arguments.length &gt; fcn.length
-      [args1, args2] = split arguments  
-      fn1 = fcn.apply(<span class="hljs-literal">null</span>, args1)
-      <span class="hljs-keyword">if</span> args2.length == <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> args2[<span class="hljs-number">0</span>] == <span class="hljs-string">'function'</span>
-        fn2 = args2[<span class="hljs-number">0</span>]
-        maybePipeDirect () -&gt; fn1(fn2.apply(<span class="hljs-literal">null</span>,arguments))
+            <div class="content"><div class='highlight'><pre>x.pipeWrap = pipeWrap = <span class="hljs-function"><span class="hljs-params">(f)</span> -&gt;</span>
+  (g) -&gt;
+    <span class="hljs-keyword">if</span> _isFunction g
+      <span class="hljs-keyword">if</span> g.length == <span class="hljs-number">1</span>
+        pipeWrap () -&gt; _execWrap(f)(g.apply(<span class="hljs-literal">null</span>, arguments))   <span class="hljs-comment"># pipe unary function</span>
       <span class="hljs-keyword">else</span>
-        fn1.apply(<span class="hljs-literal">null</span>,args2)
+        () -&gt; _execWrap(f)(g.apply(<span class="hljs-literal">null</span>, arguments))            <span class="hljs-comment"># pipe function</span>
     <span class="hljs-keyword">else</span>
-      fcn2 = fcn.apply(<span class="hljs-literal">null</span>,arguments)
-      <span class="hljs-keyword">if</span> fcn2.length == <span class="hljs-number">1</span>
-        maybePipeDirect fcn2
-      <span class="hljs-keyword">else</span>
-        fcn2</pre></div></div>
+      _execWrap(f)(g)                                           <span class="hljs-comment"># pipe value (promise or primitive)</span></pre></div></div>
             
         </li>
         
@@ -117,11 +123,21 @@ be piped to the generated function.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>Making up for the lack of export before maybePipe def’n</p>
+              <p>F’</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>x.splitAt = splitAt = maybePipe _splitAt</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_splitArgs</span> = <span class="hljs-params">(n)</span> -&gt;</span> (lst) -&gt; [(lst[i] <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..n]), lst[n]]
+x.genWrap = genWrap = <span class="hljs-function"><span class="hljs-params">(F)</span> -&gt;</span>
+  n = F.length
+  split = _splitArgs(n)
+  () -&gt;
+    <span class="hljs-keyword">if</span> arguments.length == n <span class="hljs-keyword">then</span> pipeWrap F.apply(<span class="hljs-literal">null</span>, arguments)
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> arguments.length == n+<span class="hljs-number">1</span>
+      [args, x] = split arguments
+      f = F.apply(<span class="hljs-literal">null</span>, args)
+      pipeWrap(f)(x)
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error <span class="hljs-string">'Incorrect argument count'</span></pre></div></div>
             
         </li>
         
@@ -132,23 +148,10 @@ be piped to the generated function.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p><strong>maybePipeDirect</strong> =&gt; (<em> -&gt; </em>) -&gt; (<em> -&gt; </em>) or a</p>
-<p>Returns the executed original function if passed a value
-as an argument.  If passed a function, it will
-be piped to the original function.  Only works for
-single-argument functions</p>
+              <h2 id="normal-functions">Normal Functions</h2>
+<p>Functions that do not generate promises</p>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>x.maybePipeDirect = maybePipeDirect = <span class="hljs-function"><span class="hljs-params">(fcn)</span> -&gt;</span>
-  (val) -&gt;
-    <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> val == <span class="hljs-string">'function'</span>
-      <span class="hljs-keyword">if</span> val.length == <span class="hljs-number">1</span>
-        maybePipeDirect(<span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span> fcn(val.apply(<span class="hljs-literal">null</span>,arguments)))
-      <span class="hljs-keyword">else</span>
-        () -&gt; fcn(val.apply(<span class="hljs-literal">null</span>,arguments))
-    <span class="hljs-keyword">else</span>
-      fcn(val)</pre></div></div>
             
         </li>
         
@@ -159,10 +162,16 @@ single-argument functions</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>maybe f(x) -&gt; f(y) if x is y
-             f(f2(y)) x is f2</p>
+              <p><strong>all</strong> =&gt; (a -&gt; Boolean) -&gt; ([a] -&gt; Boolean)</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_all</span> = <span class="hljs-params">(fn)</span> -&gt;</span>
+  (lst) -&gt;
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> !(fn item)
+    <span class="hljs-literal">true</span>
+x.all = all = genWrap _all</pre></div></div>
             
         </li>
         
@@ -173,26 +182,6 @@ single-argument functions</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p><strong>all</strong> =&gt; (a -&gt; Boolean) -&gt; ([a] -&gt; Boolean)</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_all</span> = <span class="hljs-params">(fn)</span> -&gt;</span>
-  (lst) -&gt;
-    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
-      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> !(fn item)
-    <span class="hljs-literal">true</span>
-x.all = all = maybePipe _all</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
-              </div>
               <p><strong>allPass</strong> =&gt; [(a -&gt; Boolean)] -&gt; (a -&gt; Boolean)</p>
 
             </div>
@@ -202,16 +191,16 @@ x.all = all = maybePipe _all</pre></div></div>
     <span class="hljs-keyword">for</span> fcn <span class="hljs-keyword">in</span> lst
       <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> !(fcn val)
     <span class="hljs-literal">true</span>
-x.allPass = allPass = maybePipe _allPass</pre></div></div>
+x.allPass = allPass = genWrap _allPass</pre></div></div>
             
         </li>
         
         
-        <li id="section-10">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p><strong>always</strong> =&gt; a -&gt; (* -&gt; a)</p>
 <p>Piping makes no sense</p>
@@ -224,11 +213,11 @@ x.allPass = allPass = maybePipe _allPass</pre></div></div>
         </li>
         
         
-        <li id="section-11">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p><strong>any</strong> =&gt; (a -&gt; Boolean) -&gt; ([a] -&gt; Boolean)</p>
 
@@ -239,16 +228,16 @@ x.allPass = allPass = maybePipe _allPass</pre></div></div>
     <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
       <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">if</span> (fn item)
     <span class="hljs-literal">false</span>
-x.any = any = maybePipe _any</pre></div></div>
+x.any = any = genWrap _any</pre></div></div>
             
         </li>
         
         
-        <li id="section-12">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p><strong>anyPass</strong> =&gt; [(a -&gt; Boolean)] -&gt; (a -&gt; Boolean)</p>
 
@@ -259,16 +248,16 @@ x.any = any = maybePipe _any</pre></div></div>
     <span class="hljs-keyword">for</span> fcn <span class="hljs-keyword">in</span> lst
       <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">if</span> (fcn val)
     <span class="hljs-literal">false</span>
-x.anyPass = anyPass = maybePipe _anyPass</pre></div></div>
+x.anyPass = anyPass = genWrap _anyPass</pre></div></div>
             
         </li>
         
         
-        <li id="section-13">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p><strong>callAll</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; [])</p>
 
@@ -280,16 +269,16 @@ x.anyPass = anyPass = maybePipe _anyPass</pre></div></div>
     <span class="hljs-keyword">for</span> fcn <span class="hljs-keyword">in</span> fcns
       result.push fcn val
     result
-x.callAll = callAll = maybePipe _callAll</pre></div></div>
+x.callAll = callAll = genWrap _callAll</pre></div></div>
             
         </li>
         
         
-        <li id="section-14">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p><strong>chain</strong> =&gt; (a -&gt; []) -&gt; ([a] -&gt; [])</p>
 
@@ -302,19 +291,19 @@ x.callAll = callAll = maybePipe _callAll</pre></div></div>
       <span class="hljs-keyword">for</span> res <span class="hljs-keyword">in</span> fcn(item)
         result.push res
     result
-x.chain = chain = maybePipe _chain</pre></div></div>
+x.chain = chain = genWrap _chain</pre></div></div>
             
         </li>
         
         
-        <li id="section-15">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p><strong>compose</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; a)</p>
-<p>Can’t be maybePipe’d due to unknown arg count</p>
+<p>Can’t be genWrap’d due to unknown arg count</p>
 
             </div>
             
@@ -332,14 +321,14 @@ x.chain = chain = maybePipe _chain</pre></div></div>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p><strong>concat</strong> =&gt; []… -&gt; []</p>
-<p>Can’t be maybePipe’d due to unknown arg count</p>
+<p>Can’t be genWrap’d due to unknown arg count</p>
 
             </div>
             
@@ -355,11 +344,11 @@ x.chain = chain = maybePipe _chain</pre></div></div>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p><strong>clone</strong> =&gt; {} -&gt; {}</p>
 
@@ -371,11 +360,11 @@ x.chain = chain = maybePipe _chain</pre></div></div>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p><strong>drop</strong> =&gt; Int -&gt; ([] -&gt; {})</p>
 
@@ -387,16 +376,16 @@ x.chain = chain = maybePipe _chain</pre></div></div>
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [n...lst.length]
       r.push lst[i]
     r
-x.drop = drop = maybePipe _drop</pre></div></div>
+x.drop = drop = genWrap _drop</pre></div></div>
             
         </li>
         
         
-        <li id="section-19">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p><strong>filter</strong> =&gt; (a -&gt; Boolean) -&gt; ([] -&gt; [])</p>
 
@@ -408,16 +397,16 @@ x.drop = drop = maybePipe _drop</pre></div></div>
     <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
       r.push item <span class="hljs-keyword">if</span> fcn item
     r
-x.filter = filter = maybePipe _filter</pre></div></div>
+x.filter = filter = genWrap _filter</pre></div></div>
             
         </li>
         
         
-        <li id="section-20">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p><strong>filterIndex</strong> =&gt; (a,i -&gt; Boolean) -&gt; ([] -&gt; [])</p>
 
@@ -429,16 +418,16 @@ x.filter = filter = maybePipe _filter</pre></div></div>
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..lst.length]
       r.push lst[i] <span class="hljs-keyword">if</span> fcn lst[i], i
     r
-x.filterIndex = filterIndex = maybePipe _filterIndex</pre></div></div>
+x.filterIndex = filterIndex = genWrap _filterIndex</pre></div></div>
             
         </li>
         
         
-        <li id="section-21">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p><strong>flatten</strong> =&gt; [[]] -&gt; []</p>
 
@@ -452,16 +441,16 @@ x.filterIndex = filterIndex = maybePipe _filterIndex</pre></div></div>
       r = r.concat subs
     <span class="hljs-keyword">else</span> r.push item
   r
-x.flatten = flatten = maybePipeDirect _flatten</pre></div></div>
+x.flatten = flatten = pipeWrap _flatten</pre></div></div>
             
         </li>
         
         
-        <li id="section-22">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p><strong>id</strong> =&gt; a -&gt; a</p>
 
@@ -472,11 +461,11 @@ x.flatten = flatten = maybePipeDirect _flatten</pre></div></div>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p><strong>init</strong> =&gt; [] -&gt; []</p>
 
@@ -487,16 +476,16 @@ x.flatten = flatten = maybePipeDirect _flatten</pre></div></div>
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..lst.length-<span class="hljs-number">1</span>]
       r.push lst[i]
     r
-x.init = init = maybePipe _init</pre></div></div>
+x.init = init = genWrap _init</pre></div></div>
             
         </li>
         
         
-        <li id="section-24">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p><strong>isNothing</strong> =&gt; a -&gt; Boolean</p>
 
@@ -507,7 +496,23 @@ x.init = init = maybePipe _init</pre></div></div>
   <span class="hljs-keyword">return</span> a.trim().length == <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> a == <span class="hljs-string">'string'</span>
   <span class="hljs-keyword">return</span> Object.keys(a).length == <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> a == <span class="hljs-string">'object'</span> 
   <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
-x.isNothing = isNothing = maybePipeDirect _isNothing</pre></div></div>
+x.isNothing = isNothing = pipeWrap _isNothing</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p><strong>keys</strong> =&gt; ({} -&gt; [String])</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_keys</span> = <span class="hljs-params">(a)</span> -&gt;</span> Object.keys a
+x.keys = keys = pipeWrap _keys</pre></div></div>
             
         </li>
         
@@ -517,22 +522,6 @@ x.isNothing = isNothing = maybePipeDirect _isNothing</pre></div></div>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
-              </div>
-              <p><strong>keys</strong> =&gt; ({} -&gt; [String])</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_keys</span> = <span class="hljs-params">(a)</span> -&gt;</span> Object.keys a
-x.keys = keys = maybePipeDirect _keys</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-26">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p><strong>map</strong> =&gt; (a -&gt; a) -&gt; ([a] -&gt; [a])</p>
 
@@ -544,16 +533,16 @@ x.keys = keys = maybePipeDirect _keys</pre></div></div>
     <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
       result.push fcn(item)
     result
-x.map = map = maybePipe _map</pre></div></div>
+x.map = map = genWrap _map</pre></div></div>
             
         </li>
         
         
-        <li id="section-27">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p><strong>mapIndex</strong> =&gt; (a,Int -&gt; a) -&gt; ([a] -&gt; [a])</p>
 
@@ -565,16 +554,16 @@ x.map = map = maybePipe _map</pre></div></div>
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..lst.length]
       result.push fcn(lst[i], i)
     result
-x.mapIndex = mapIndex = maybePipe _mapIndex</pre></div></div>
+x.mapIndex = mapIndex = genWrap _mapIndex</pre></div></div>
             
         </li>
         
         
-        <li id="section-28">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p><strong>mapObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {})</p>
 
@@ -586,19 +575,19 @@ x.mapIndex = mapIndex = maybePipe _mapIndex</pre></div></div>
     <span class="hljs-keyword">for</span> key, item <span class="hljs-keyword">of</span> obj
       result[key] = fcn(item)
     result
-x.mapObj = mapObj = maybePipe _mapObj</pre></div></div>
+x.mapObj = mapObj = genWrap _mapObj</pre></div></div>
             
         </li>
         
         
-        <li id="section-29">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p><strong>pipe</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; a)</p>
-<p>Can’t be maybePipe’d due to unknown arg count</p>
+<p>Can’t be genWrap’d due to unknown arg count</p>
 
             </div>
             
@@ -615,27 +604,27 @@ x.mapObj = mapObj = maybePipe _mapObj</pre></div></div>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p><strong>prop</strong> =&gt; String -&gt; ({} -&gt; a)</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_prop</span> = <span class="hljs-params">(key)</span> -&gt;</span> (obj) -&gt; obj[key]
-x.prop = prop = maybePipe _prop</pre></div></div>
+x.prop = prop = genWrap _prop</pre></div></div>
             
         </li>
         
         
-        <li id="section-31">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p><strong>reduce</strong> =&gt; (b,a -&gt; b) -&gt; b -&gt; ([a] -&gt; b)</p>
 
@@ -658,6 +647,28 @@ x.prop = prop = maybePipe _prop</pre></div></div>
         </li>
         
         
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p><strong>splitAt</strong> =&gt; Int -&gt; ([] -&gt; [[],[]])</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_splitAt</span> = <span class="hljs-params">(n)</span> -&gt;</span>
+  (lst) -&gt;
+    r1 = []
+    r2 = []
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..lst.length]
+      <span class="hljs-keyword">if</span> i &lt; n <span class="hljs-keyword">then</span> r1.push lst[i] <span class="hljs-keyword">else</span> r2.push lst[i]
+    [r1,r2]
+x.splitAt = splitAt = genWrap _splitAt</pre></div></div>
+            
+        </li>
+        
+        
         <li id="section-32">
             <div class="annotation">
               
@@ -669,7 +680,7 @@ x.prop = prop = maybePipe _prop</pre></div></div>
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_splitHead</span> = <span class="hljs-params">(lst)</span> -&gt;</span> [lst[<span class="hljs-number">0</span>], tail lst]
-x.splitHead = splitHead = maybePipeDirect _splitHead</pre></div></div>
+x.splitHead = splitHead = pipeWrap _splitHead</pre></div></div>
             
         </li>
         
@@ -685,7 +696,7 @@ x.splitHead = splitHead = maybePipeDirect _splitHead</pre></div></div>
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_splitHead</span> = <span class="hljs-params">(lst)</span> -&gt;</span> [init lst, lst[-<span class="hljs-number">1.</span>.-<span class="hljs-number">1</span>]]
-x.splitLast = splitLast = maybePipeDirect _splitHead</pre></div></div>
+x.splitLast = splitLast = pipeWrap _splitHead</pre></div></div>
             
         </li>
         
@@ -705,7 +716,7 @@ x.splitLast = splitLast = maybePipeDirect _splitHead</pre></div></div>
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span>..lst.length]
       r.push lst[i]
     r
-x.tail = tail = maybePipeDirect _tail</pre></div></div>
+x.tail = tail = pipeWrap _tail</pre></div></div>
             
         </li>
         
@@ -726,7 +737,7 @@ x.tail = tail = maybePipeDirect _tail</pre></div></div>
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..n]
       r.push lst[i]
     r
-x.take = take = maybePipe _take</pre></div></div>
+x.take = take = genWrap _take</pre></div></div>
             
         </li>
         
@@ -777,7 +788,7 @@ on the object resulting after descending</p>
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..keys.length]
       r[keys[i]] = vals[i]
     r
-x.zipObj = zipObj = maybePipe _zip</pre></div></div>
+x.zipObj = zipObj = genWrap _zip</pre></div></div>
             
         </li>
         
@@ -798,7 +809,7 @@ x.zipObj = zipObj = maybePipe _zip</pre></div></div>
     <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> keys
       r[key] = fcn key
     r
-x.zipKeys = zipKeys = maybePipe _zipKeys</pre></div></div>
+x.zipKeys = zipKeys = genWrap _zipKeys</pre></div></div>
             
         </li>
         
@@ -823,14 +834,43 @@ x.zipKeys = zipKeys = maybePipe _zipKeys</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
+              <p><strong>maybeqQPipeDirect</strong> =&gt; (<em> -&gt; </em>) -&gt; (<em> -&gt; </em>) or a</p>
+<p>Returns the executed original function if passed a value
+as an argument.  If passed a function, it will
+be piped to the original function.  Only works for
+single-argument functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>x.maybeQPipeDirect = maybeQPipeDirect = <span class="hljs-function"><span class="hljs-params">(fcn)</span> -&gt;</span>
+  (val) -&gt;
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> val == <span class="hljs-string">'function'</span>
+      <span class="hljs-keyword">if</span> val.length == <span class="hljs-number">1</span>
+        pipeWrap () -&gt;
+          fcn.apply(<span class="hljs-literal">null</span>, arguments)
+          .<span class="hljs-keyword">then</span> (x) -&gt; val(x)
+      <span class="hljs-keyword">else</span>
+        () -&gt; fcn(val.apply(<span class="hljs-literal">null</span>,arguments))
+    <span class="hljs-keyword">else</span>
+      fcn(val)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
               <p><strong>qCompose</strong> =&gt; [(a -&gt; Q a)] -&gt; (a -&gt; Q a)</p>
-<p>Can’t be maybePipe’d due to unknown arg count</p>
+<p>Can’t be genWrap’d due to unknown arg count</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>x.qCompose = qCompose = <span class="hljs-function">-&gt;</span>
 <span class="hljs-function">  <span class="hljs-title">_qPipe</span> = <span class="hljs-params">(f1,f2)</span> -&gt;</span>
-    () -&gt; f1.apply(<span class="hljs-number">0</span>, arguments).<span class="hljs-keyword">then</span> (x) -&gt; f2(x)
+    () -&gt; f1.apply(<span class="hljs-literal">null</span>, arguments).<span class="hljs-keyword">then</span> (x) -&gt; f2(x)
   
   fcns = []
   <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> arguments
@@ -844,14 +884,14 @@ x.zipKeys = zipKeys = maybePipe _zipKeys</pre></div></div>
         </li>
         
         
-        <li id="section-41">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p><strong>qPipe</strong> =&gt; [(a -&gt; Q a)] -&gt; (a -&gt; Q a)</p>
-<p>Can’t be maybePipe’d due to unknown arg count</p>
+<p>Can’t be genWrap’d due to unknown arg count</p>
 
             </div>
             
@@ -875,42 +915,13 @@ defers.forEach (fcn) -&gt; fcn()</pre></div></div>
         </li>
         
         
-        <li id="section-42">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
-              </div>
-              <p>Speed testing</p>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
-              <p>keys = [‘a’,’b’,’c’,’d’,’e’]
-vals = [1,2,3,4,5]
-f0 = _zip keys
-f1 = zip keys
-n=1000000</p>
-<p>t0 = Date.now()
-for i in [0…n]
- f0 vals
-p Date.now() - t0</p>
-<p>t0 = Date.now()
-for i in [0…n]
- f1 vals
-p Date.now() - t0</p>
-<p>t0 = Date.now()
-for i in [0…n]
- zip keys, vals
-p Date.now() - t0</p>
+              <p>Speed testing</p>
 
             </div>
             
@@ -923,36 +934,48 @@ p Date.now() - t0</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
-              <p>map = maybePipe _map</p>
-<p>add = (x) -&gt; x + 1
-range = (x) -&gt; [0…x]</p>
-<p>p ‘compiling’</p>
-<p>mapAddA = _map add
-mapAddB = map add
-mapAddRange = map add, range</p>
-<p>p ‘executing’</p>
-<p>p mapAddA(range(4))
-p mapAddRange(4)
-p mapAddB(range(4))
-p map add, range(4)</p>
-<p>m = 10
-n = 150000</p>
-<p>t0 = Date.now()
-for i in [0…n]
- mapAddA(range(m))
-p Date.now() - t0</p>
-<p>t0 = Date.now()
-for i in [0…n]
- mapAddRange(m)
-p Date.now() - t0</p>
-<p>t0 = Date.now()
-for i in [0…n]
- mapAddB(range(m))
-p Date.now() - t0</p>
-<p>t0 = Date.now()
-for i in [0…n]
- map add, range(m)
-p Date.now() - t0</p>
+              <p>_splitLast = (n) -&gt; (lst) -&gt; [(lst[i] for i in [0…n-1]), lst[n-1]]
+_apply = (f, args, x) -&gt; xs = (args[i] for i in [0…args.length]); xs.push x; f.apply(null, xs)
+_pApply = (f, args) -&gt; (x) -&gt; _apply(f, args, x)
+altPipeWrap = (f) -&gt;
+ split = _splitLast f.length
+ () -&gt;
+   [args, g] = split arguments
+   if _isFunction g
+     altPipeWrap () -&gt; _apply f, args, g.apply(null, arguments)
+   else if g == undefined and f.length &gt; 0
+     altPipeWrap (x) -&gt; _apply f, args, x
+   else if _isPromise g
+     g.then (val) -&gt; _apply f, args, val 
+   else
+     _apply f, args, g</p>
+<p>_map2 = (fcn, lst) -&gt;
+ result = []
+ for item in lst
+   result.push fcn(item)
+ result
+map2 = altPipeWrap _map2</p>
+<p>_filter2 = (fcn, lst) -&gt;
+ r = []
+ for item in lst
+   r.push item if fcn item
+ r
+filter2 = altPipeWrap _filter2</p>
+<p>data = [33..122]
+f = String.fromCharCode
+flt = (x) -&gt; x &lt; “b”</p>
+<p>n = 500000</p>
+<p>test = (fcn) -&gt; 
+ t0 = Date.now()
+ for i in [0…n]
+   fcn()
+ p Date.now() - t0</p>
+<p>f1 = filter flt, map f
+p f1 [66,67,68]
+test (-&gt; f1 data)</p>
+<p>f1 = filter2 flt, map2 f
+p f1 [66,67,68]
+test (-&gt; f1 data)</p>
 
             </div>
             

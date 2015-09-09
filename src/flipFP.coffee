@@ -18,8 +18,27 @@ defers = []
 #   f'(x) = | x is value -> f(x)
 #           | x is promise -> x.then((val) -> f(val))
 #
+#   With f' we know we are executing
+#
+#
 #   f''(x) = | x is function g(y) -> h(y) = f'(g(y))
 #            | otherwise f'(x)
+#
+#   With f'' we may be compiling
+#
+#
+#
+#
+# Given a function *generator* F(a,b,...) that generates a unary function f(x)
+#
+# It can be passed two quantities of parameters
+#
+#   a. The correct amount
+#   b. The correct amount + 1, intending to execute the generated function
+#
+#   F'(a,b,...) = F(a,b,...)'' = f''
+#   F'(a,b,...,x) = F(a,b,...)''(x) = f''(x)
+# 
 
 
 _isFunction = (x) -> typeof x == 'function'
@@ -29,118 +48,44 @@ _isPromise = (x) -> x != null and typeof x == 'object' && 'then' of x
 # f'
 _execWrap = (f) ->
   (x) ->
-    if _isPromise x then x.then((y) -> f(y))        # exec promise
-    else f(x)                                       # exec primitive
+    if _isPromise x then x.then((y) -> f(y))          # exec promise
+    else                 f(x)                         # exec primitive
+  
       
 # f''
-x.pipeWrap = _pipeWrap = (f) ->
+x.pipeWrap = pipeWrap = (f) ->
   (g) ->
-    if _isFunction g then (y) -> _execWrap(f)(g(y)) # pipe function
-    else _execWrap(f)(g)                            # pipe value
-  
-  
-  
-# Internal piping functions
-#
-# Note that f1 is assumed to occur *before* f2
-#
-
-_isPromise = (x) -> x != null and typeof x == 'object' && 'then' of x
-
-_pipe = (f1,f2) ->
-  () ->
-    x1 = f1.apply(null, arguments)
-    if _isPromise x1
-      x1.then (x2) -> f2(x2)
+    if _isFunction g
+      if g.length == 1
+        pipeWrap () -> _execWrap(f)(g.apply(null, arguments))   # pipe unary function
+      else
+        () -> _execWrap(f)(g.apply(null, arguments))            # pipe function
     else
-      f2(x1)
-
-_qPipe = (f1,f2) ->
-  () -> f1.apply(null, arguments).then (x) -> f2(x)
-
+      _execWrap(f)(g)                                           # pipe value (promise or primitive)
   
+  
+# F'
+_splitArgs = (n) -> (lst) -> [(lst[i] for i in [0...n]), lst[n]]
+x.genWrap = genWrap = (F) ->
+  n = F.length
+  split = _splitArgs(n)
+  () ->
+    if arguments.length == n then pipeWrap F.apply(null, arguments)
+    else if arguments.length == n+1
+      [args, x] = split arguments
+      f = F.apply(null, args)
+      pipeWrap(f)(x)
+    else throw new Error 'Incorrect argument count'
+      
+  
+  
+  
+
+
+
 # ## Normal Functions
 #
-#   Functions that do not operate on promises
-
-#
-#**splitAt** => Int -> ([] -> [[],[]])
-#
-_splitAt = (n) ->
-  (lst) ->
-    r1 = []
-    r2 = []
-    for i in [0...lst.length]
-      if i < n then r1.push lst[i] else r2.push lst[i]
-    [r1,r2]
-
-
-# Remove the debug functions once stable
-debug = false
-
-#
-#**maybePipe** => (* -> *) -> (* -> *) or a
-#
-# Returns the original function generator if passed the proper
-# amount of parameters, and if passed more will returned the
-# executed function unless there is only on extra param and a
-# function is passed.  In that case, the fucnction passed will
-# be piped to the generated function.
-#
-x.maybePipe = maybePipe = (fcn) ->
-  n = fcn.length
-  split = _splitAt n
-  () ->
-    if arguments.length > fcn.length
-      [args1, args2] = split arguments  
-      fn1 = fcn.apply(null, args1)
-      if args2.length == 1 and typeof args2[0] == 'function'
-        fn2 = args2[0]
-        p 'piped and conditional' if debug
-        maybePipeDirect _pipe(fn2,fn1)
-      else if args2.length == 1 and _isPromise args2[0]
-        p 'direct q' if debug
-        args2[0].then (x) -> fn1(x)
-      else
-        p 'direct' if debug
-        fn1.apply(null,args2)
-    else
-      fcn2 = fcn.apply(null,arguments)
-      if fcn2.length == 1
-        p 'conditional' if debug
-        maybePipeDirect fcn2
-      else
-        p 'static' if debug
-        fcn2
-
-
-# Making up for the lack of export before maybePipe def'n
-x.splitAt = splitAt = maybePipe _splitAt
-
-
-#
-#**maybePipeDirect** => (* -> *) -> (* -> *) or a
-#
-# Returns the executed original function if passed a value
-# as an argument.  If passed a function, it will
-# be piped to the original function.  Only works for
-# single-argument functions
-#
-x.maybePipeDirect = maybePipeDirect = (fcn) ->
-  (val) ->
-    if typeof val == 'function'
-      if val.length == 1
-        p 'single piped and conditional' if debug
-        maybePipeDirect _pipe(val,fcn)
-      else
-        p 'single piped' if debug
-        _pipe(val,fcn)
-    else if _isPromise val
-      p 'single direct q' if debug
-      val.then (x) -> fcn(x)
-    else
-      p 'single direct' if debug
-      fcn(val)
+# Functions that do not generate promises
 
 
 #
@@ -151,7 +96,7 @@ _all = (fn) ->
     for item in lst
       return false if !(fn item)
     true
-x.all = all = maybePipe _all
+x.all = all = genWrap _all
 
 
 #
@@ -162,7 +107,7 @@ _allPass = (lst) ->
     for fcn in lst
       return false if !(fcn val)
     true
-x.allPass = allPass = maybePipe _allPass
+x.allPass = allPass = genWrap _allPass
 
 
 #
@@ -182,7 +127,7 @@ _any = (fn) ->
     for item in lst
       return true if (fn item)
     false
-x.any = any = maybePipe _any
+x.any = any = genWrap _any
 
 
 #
@@ -193,7 +138,7 @@ _anyPass = (lst) ->
     for fcn in lst
       return true if (fcn val)
     false
-x.anyPass = anyPass = maybePipe _anyPass
+x.anyPass = anyPass = genWrap _anyPass
 
 
 #
@@ -205,7 +150,7 @@ _callAll = (fcns) ->
     for fcn in fcns
       result.push fcn val
     result
-x.callAll = callAll = maybePipe _callAll
+x.callAll = callAll = genWrap _callAll
 
 
 #
@@ -218,13 +163,13 @@ _chain = (fcn) ->
       for res in fcn(item)
         result.push res
     result
-x.chain = chain = maybePipe _chain
+x.chain = chain = genWrap _chain
 
 
 #
 #**compose** => [(a -> a)] -> (a -> a)
 #
-# Can't be maybePipe'd due to unknown arg count
+# Can't be genWrap'd due to unknown arg count
 #
 x.compose = compose = () ->
   fcns = []
@@ -241,7 +186,7 @@ x.compose = compose = () ->
 #
 #**concat** => []... -> []
 #
-# Can't be maybePipe'd due to unknown arg count
+# Can't be genWrap'd due to unknown arg count
 #
 x.concat = concat = () ->
   result = []
@@ -270,7 +215,7 @@ _drop = (n) ->
     for i in [n...lst.length]
       r.push lst[i]
     r
-x.drop = drop = maybePipe _drop
+x.drop = drop = genWrap _drop
 
 
 #
@@ -282,7 +227,7 @@ _filter = (fcn) ->
     for item in lst
       r.push item if fcn item
     r
-x.filter = filter = maybePipe _filter
+x.filter = filter = genWrap _filter
 
 
 #
@@ -294,7 +239,7 @@ _filterIndex = (fcn) ->
     for i in [0...lst.length]
       r.push lst[i] if fcn lst[i], i
     r
-x.filterIndex = filterIndex = maybePipe _filterIndex
+x.filterIndex = filterIndex = genWrap _filterIndex
 
 
 #
@@ -308,7 +253,7 @@ _flatten = (lst) ->
       r = r.concat subs
     else r.push item
   r
-x.flatten = flatten = maybePipeDirect _flatten
+x.flatten = flatten = pipeWrap _flatten
 
 
 #
@@ -325,7 +270,7 @@ _init = (lst) ->
     for i in [0...lst.length-1]
       r.push lst[i]
     r
-x.init = init = maybePipe _init
+x.init = init = genWrap _init
 
 
 #
@@ -336,14 +281,14 @@ _isNothing = (a) ->
   return a.trim().length == 0 if typeof a == 'string'
   return Object.keys(a).length == 0 if typeof a == 'object' 
   return false
-x.isNothing = isNothing = maybePipeDirect _isNothing
+x.isNothing = isNothing = pipeWrap _isNothing
 
 
 #
 #**keys** => ({} -> [String])
 #
 _keys = (a) -> Object.keys a
-x.keys = keys = maybePipeDirect _keys
+x.keys = keys = pipeWrap _keys
 
 
 #
@@ -355,7 +300,7 @@ _map = (fcn) ->
     for item in lst
       result.push fcn(item)
     result
-x.map = map = maybePipe _map
+x.map = map = genWrap _map
 
 
 #
@@ -367,7 +312,7 @@ _mapIndex = (fcn) ->
     for i in [0...lst.length]
       result.push fcn(lst[i], i)
     result
-x.mapIndex = mapIndex = maybePipe _mapIndex
+x.mapIndex = mapIndex = genWrap _mapIndex
   
 
 #
@@ -379,13 +324,13 @@ _mapObj = (fcn) ->
     for key, item of obj
       result[key] = fcn(item)
     result
-x.mapObj = mapObj = maybePipe _mapObj
+x.mapObj = mapObj = genWrap _mapObj
 
 
 #
 #**pipe** => [(a -> a)] -> (a -> a)
 #
-# Can't be maybePipe'd due to unknown arg count
+# Can't be genWrap'd due to unknown arg count
 #
 x.pipe = pipe = ->
   fcns = []
@@ -402,7 +347,7 @@ x.pipe = pipe = ->
 #**prop** => String -> ({} -> a)
 #
 _prop = (key) -> (obj) -> obj[key]
-x.prop = prop = maybePipe _prop
+x.prop = prop = genWrap _prop
 
 
 #
@@ -424,17 +369,30 @@ x.reduce = reduce = () ->
 
 
 #
+#**splitAt** => Int -> ([] -> [[],[]])
+#
+_splitAt = (n) ->
+  (lst) ->
+    r1 = []
+    r2 = []
+    for i in [0...lst.length]
+      if i < n then r1.push lst[i] else r2.push lst[i]
+    [r1,r2]
+x.splitAt = splitAt = genWrap _splitAt
+
+
+#
 #**splitHead** => [a] -> [a,[]]
 #
 _splitHead = (lst) -> [lst[0], tail lst]
-x.splitHead = splitHead = maybePipeDirect _splitHead
+x.splitHead = splitHead = pipeWrap _splitHead
 
 
 #
 #**splitLast** => [a] -> [[],a]
 #
 _splitHead = (lst) -> [init lst, lst[-1..-1]]
-x.splitLast = splitLast = maybePipeDirect _splitHead
+x.splitLast = splitLast = pipeWrap _splitHead
 
 
 #
@@ -445,7 +403,7 @@ _tail = (lst) ->
     for i in [1...lst.length]
       r.push lst[i]
     r
-x.tail = tail = maybePipeDirect _tail
+x.tail = tail = pipeWrap _tail
 
 
 #
@@ -457,7 +415,7 @@ _take = (n) ->
     for i in [0...n]
       r.push lst[i]
     r
-x.take = take = maybePipe _take
+x.take = take = genWrap _take
 
 
 #
@@ -491,7 +449,7 @@ _zip = (keys) ->
     for i in [0...keys.length]
       r[keys[i]] = vals[i]
     r
-x.zipObj = zipObj = maybePipe _zip
+x.zipObj = zipObj = genWrap _zip
 
 
 #
@@ -503,7 +461,7 @@ _zipKeys = (fcn) ->
     for key in keys
       r[key] = fcn key
     r
-x.zipKeys = zipKeys = maybePipe _zipKeys
+x.zipKeys = zipKeys = genWrap _zipKeys
 
 
 # ## Q Functions
@@ -522,7 +480,7 @@ x.maybeQPipeDirect = maybeQPipeDirect = (fcn) ->
   (val) ->
     if typeof val == 'function'
       if val.length == 1
-        maybePipeDirect () ->
+        pipeWrap () ->
           fcn.apply(null, arguments)
           .then (x) -> val(x)
       else
@@ -534,7 +492,7 @@ x.maybeQPipeDirect = maybeQPipeDirect = (fcn) ->
 #
 #**qCompose** => [(a -> Q a)] -> (a -> Q a)
 #
-# Can't be maybePipe'd due to unknown arg count
+# Can't be genWrap'd due to unknown arg count
 #
 x.qCompose = qCompose = ->
   _qPipe = (f1,f2) ->
@@ -554,7 +512,7 @@ x.qCompose = qCompose = ->
 #
 #**qPipe** => [(a -> Q a)] -> (a -> Q a)
 #
-# Can't be maybePipe'd due to unknown arg count
+# Can't be genWrap'd due to unknown arg count
 #
 x.qPipe = qPipe = ->
   _qPipe = (f1,f2) ->
@@ -576,69 +534,57 @@ defers.forEach (fcn) -> fcn()
 
 #Speed testing
 
-#keys = ['a','b','c','d','e']
-#vals = [1,2,3,4,5]
-#f0 = _zip keys
-#f1 = zip keys
-#n=1000000
+#_splitLast = (n) -> (lst) -> [(lst[i] for i in [0...n-1]), lst[n-1]]
+#_apply = (f, args, x) -> xs = (args[i] for i in [0...args.length]); xs.push x; f.apply(null, xs)
+#_pApply = (f, args) -> (x) -> _apply(f, args, x)
+#altPipeWrap = (f) ->
+#  split = _splitLast f.length
+#  () ->
+#    [args, g] = split arguments
+#    if _isFunction g
+#      altPipeWrap () -> _apply f, args, g.apply(null, arguments)
+#    else if g == undefined and f.length > 0
+#      altPipeWrap (x) -> _apply f, args, x
+#    else if _isPromise g
+#      g.then (val) -> _apply f, args, val 
+#    else
+#      _apply f, args, g
+#      
 #
-#t0 = Date.now()
-#for i in [0...n]
-#  f0 vals
-#p Date.now() - t0
+#_map2 = (fcn, lst) ->
+#  result = []
+#  for item in lst
+#    result.push fcn(item)
+#  result
+#map2 = altPipeWrap _map2
 #
-#t0 = Date.now()
-#for i in [0...n]
-#  f1 vals
-#p Date.now() - t0
 #
-#t0 = Date.now()
-#for i in [0...n]
-#  zip keys, vals
-#p Date.now() - t0
+#_filter2 = (fcn, lst) ->
+#  r = []
+#  for item in lst
+#    r.push item if fcn item
+#  r
+#filter2 = altPipeWrap _filter2
+#
+#
+#data = [33..122]
+#f = String.fromCharCode
+#flt = (x) -> x < "b"
+#
+#n = 500000
+#
+#test = (fcn) -> 
+#  t0 = Date.now()
+#  for i in [0...n]
+#    fcn()
+#  p Date.now() - t0
+#
+#
+#f1 = filter flt, map f
+#p f1 [66,67,68]
+#test (-> f1 data)
+#
+#f1 = filter2 flt, map2 f
+#p f1 [66,67,68]
+#test (-> f1 data)
 
-# 
-#map = maybePipe _map
-#
-#add = (x) -> x + 1
-#range = (x) -> [0...x]
-#
-#
-#p 'compiling'
-#
-#mapAddA = _map add
-#mapAddB = map add
-#mapAddRange = map add, range
-#
-#
-#p 'executing'
-#
-#
-#p mapAddA(range(4))
-#p mapAddRange(4)
-#p mapAddB(range(4))
-#p map add, range(4)
-#
-#
-#m = 10
-#n = 150000
-#
-#t0 = Date.now()
-#for i in [0...n]
-#  mapAddA(range(m))
-#p Date.now() - t0
-#
-#t0 = Date.now()
-#for i in [0...n]
-#  mapAddRange(m)
-#p Date.now() - t0
-#
-#t0 = Date.now()
-#for i in [0...n]
-#  mapAddB(range(m))
-#p Date.now() - t0
-#
-#t0 = Date.now()
-#for i in [0...n]
-#  map add, range(m)
-#p Date.now() - t0

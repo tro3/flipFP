@@ -367,10 +367,10 @@ describe 'zipKeys', ->
     assert.deepEqual (fp.zipKeys testFn, ['add', 'subtract']), {add:'A', subtract:'S'}
 
 
-describe.only 'pipe wrapper', ->
-  fa = fp.pipeWrap (x="") -> x+"a"
-  fb = fp.pipeWrap (x="") -> x+"b"
-  fp = fp.pipeWrap (x="") -> promise x+"p"
+describe 'pipe wrapper', ->
+  fa =  fp.pipeWrap (x="") -> x+"a"
+  fb =  fp.pipeWrap (x="") -> x+"b"
+  fnp = fp.pipeWrap (x="") -> promise x+"p"
 
   describe 'in compiled mode', ->
     
@@ -379,19 +379,19 @@ describe.only 'pipe wrapper', ->
       assert.equal testFn("s"), "sab"
     
     it 'handles initial promise', (done) ->
-      testFn = fb fa fp
+      testFn = fb fa fnp
       testFn("s").then (r) ->
         assert.equal r, "spab"
         done()
 
     it 'handles middle promise', (done) ->
-      testFn = fa fp fb
+      testFn = fa fnp fb
       testFn("s").then (r) ->
         assert.equal r, "sbpa"
         done()
     
     it 'handles final promise', (done) ->
-      testFn = fp fa fb
+      testFn = fnp fa fb
       testFn("s").then (r) ->
         assert.equal r, "sbap"
         done()
@@ -403,17 +403,17 @@ describe.only 'pipe wrapper', ->
       assert.equal (fb fa "s"), "sab"
     
     it 'handles initial promise', (done) ->
-      (fb fa fp "s").then (r) ->
+      (fb fa fnp "s").then (r) ->
         assert.equal r, "spab"
         done()
 
     it 'handles middle promise', (done) ->
-      (fa fp fb "s").then (r) ->
+      (fa fnp fb "s").then (r) ->
         assert.equal r, "sbpa"
         done()
     
     it 'handles final promise', (done) ->
-      (fp fa fb "s").then (r) ->
+      (fnp fa fb "s").then (r) ->
         assert.equal r, "sbap"
         done()
     
@@ -433,7 +433,7 @@ describe 'natural piping', ->
     
 
   it 'handles direct double pipe', ->
-    add1 = fp.maybePipeDirect ((x) -> x + 1)
+    add1 = fp.pipeWrap ((x) -> x + 1)
     add2 = add1 add1
     add4 = add2 add2
     assert.equal add1(1), 2
@@ -441,7 +441,7 @@ describe 'natural piping', ->
     assert.equal add4(1), 5
 
   it 'handles mixed double pipe', ->
-    add = fp.maybePipe ((i) -> (x) -> x + i)
+    add = fp.genWrap ((i) -> (x) -> x + i)
     add1 = add(1)
     add2a = add(1)(add1)
     add2b = add1 add(1)
