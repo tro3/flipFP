@@ -556,7 +556,6 @@ defers.forEach (fcn) -> fcn()
 #  for item in lst
 #    result.push fcn(item)
 #  result
-#map2 = altPipeWrap _map2
 #
 #
 #_filter2 = (fcn, lst) ->
@@ -564,14 +563,13 @@ defers.forEach (fcn) -> fcn()
 #  for item in lst
 #    r.push item if fcn item
 #  r
-#filter2 = altPipeWrap _filter2
 #
 #
 #data = [33..122]
 #f = String.fromCharCode
 #flt = (x) -> x < "b"
 #
-#n = 500000
+#n = 1500000
 #
 #test = (fcn) -> 
 #  t0 = Date.now()
@@ -584,7 +582,7 @@ defers.forEach (fcn) -> fcn()
 #p f1 [66,67,68]
 #test (-> f1 data)
 #
-#f1 = filter2 flt, map2 f
+#f1 = (x) -> _filter2 flt, _map2 f, x
 #p f1 [66,67,68]
 #test (-> f1 data)
 

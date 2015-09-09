@@ -30,6 +30,15 @@ describe 'all', ->
     assert.isTrue fp.all testFn, [6,7,8,9]
     assert.isFalse fp.all testFn, [6,7,1,9]
 
+  it 'handles promise cases', (done) ->
+    testFn = (x) -> x > 5
+    fp.all testFn, promise [6,7,8,9]
+    .then (val) -> assert.isTrue val
+    .then -> fp.all testFn, promise [6,7,1,9]
+    .then (val) -> assert.isFalse val
+    .then -> done()
+    .catch (err) -> done(err)
+
 
 describe 'allPass', ->
   it 'handles basic cases', ->
@@ -59,6 +68,19 @@ describe 'allPass', ->
     assert.isTrue fp.allPass testFn, 6
     assert.isFalse fp.allPass testFn, 1
     assert.isFalse fp.allPass testFn, 12
+
+  it 'handles promise cases', ->
+    fcns = [
+      (x) -> x > 5
+      (x) -> x < 10
+    ]
+    testFn = fp.allPass fcns
+    testFn promise 6
+    .then (val) -> assert.isTrue val
+    .then       -> fp.allPass fcns, promise 1
+    .then (val) -> assert.isFalse val
+    .then       -> testFn promise 12
+    .then (val) -> assert.isFalse val
 
 
 describe 'always', ->
