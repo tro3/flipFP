@@ -274,6 +274,27 @@ describe 'mapObj', ->
     assert.deepEqual (fn {a:1, b:1}), {a:2, b:2}
 
 
+describe 'merge', ->
+  it 'handles basic case', ->
+    testFn = fp.merge {a:1, b:2}
+    assert.deepEqual testFn({a:2,c:1}), {a:2,b:2,c:1}
+
+  it 'handles piped case', ->
+    f = (x) -> {a:x+1, c:x}
+    testFn = fp.merge {a:1, b:2}, f
+    assert.deepEqual testFn(1), {a:2,b:2,c:1}
+
+  it 'handles direct case', ->
+    testFn = fp.merge {a:1, b:2}
+    assert.deepEqual fp.merge({a:1, b:2},{a:2,c:1}), {a:2,b:2,c:1}
+
+  it 'handles promised case', ->
+    testFn = fp.merge {a:1, b:2}
+    testFn(promise {a:2,c:1})
+    .then (v) -> assert.deepEqual v, {a:2,b:2,c:1}
+
+
+
 describe 'pipe', ->
   it 'handles basic case', ->
     fn1 = (x) -> x+2

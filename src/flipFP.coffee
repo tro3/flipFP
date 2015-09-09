@@ -313,7 +313,19 @@ _mapIndex = (fcn) ->
       result.push fcn(lst[i], i)
     result
 x.mapIndex = mapIndex = genWrap _mapIndex
-  
+
+
+#
+#**mapKeys** => (String -> a) -> ([String] -> {})
+#
+_mapKeys = (fcn) ->
+  (lst) ->
+    result = {}
+    for key in lst
+      result[key] = fcn(key)
+    result
+x.mapKeys = mapKeys = genWrap _mapKeys
+
 
 #
 #**mapObj** => (a -> a) -> ({} -> {})
@@ -326,6 +338,29 @@ _mapObj = (fcn) ->
     result
 x.mapObj = mapObj = genWrap _mapObj
 
+
+#
+#**merge** => {} -> ({} -> {})
+#
+#
+defers.push ->
+  _merge = (old) ->
+    loopFn = (o, n) ->
+      return o if n == undefined
+      if n instanceof Array
+        if o instanceof Array then loopOverList o, n
+        else n
+      else if typeof n == 'object'
+        if typeof o == 'object' then loopOverObj o, n
+      else n    
+    loopOverList = (o,n) -> (loopFn(o[i],n[i]) for i in [0...n.length])  
+    loopOverObj = (o,n) -> _mapKeys((k) -> loopFn(o[k],n[k]))(_union(_keys o)(_keys n))
+
+    (new_) ->
+      loopOverObj(old, new_)
+      
+  x.merge = merge = genWrap _merge
+  
 
 #
 #**pipe** => [(a -> a)] -> (a -> a)
@@ -438,6 +473,18 @@ x.traverseObj = traverseObj = (valFcn, preFcn, postFcn) ->
     loopOverObj
     postFcn
   )
+
+
+#
+#**union** => [] -> ([] -> [])
+#
+_union = (olst) ->
+  (nlst) ->
+    r = (olst[i] for i in [0...olst.length])
+    for i in [0...nlst.length]
+      r.push nlst[i] if nlst[i] not in r
+    r
+x.union = union = genWrap _union
 
 
 #
