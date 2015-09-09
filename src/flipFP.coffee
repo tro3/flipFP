@@ -7,7 +7,7 @@ defers = []
 #
 # Given a unary function f(x):
 #
-# It can be passed three things:
+# It can be passed one of three things:
 #
 #   1. A value
 #   2. A promise
@@ -22,6 +22,21 @@ defers = []
 #            | otherwise f'(x)
 
 
+_isFunction = (x) -> typeof x == 'function'
+_isPromise = (x) -> x != null and typeof x == 'object' && 'then' of x
+
+    
+# f'
+_execWrap = (f) ->
+  (x) ->
+    if _isPromise x then x.then((y) -> f(y))        # exec promise
+    else f(x)                                       # exec primitive
+      
+# f''
+x.pipeWrap = _pipeWrap = (f) ->
+  (g) ->
+    if _isFunction g then (y) -> _execWrap(f)(g(y)) # pipe function
+    else _execWrap(f)(g)                            # pipe value
   
   
   

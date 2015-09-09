@@ -1,6 +1,7 @@
 q = require 'q'
 assert = require('chai').assert
 p = console.log
+qp = (x) -> console.log x; return x
 
 fp = require '../src/flipFP'
 
@@ -364,6 +365,59 @@ describe 'zipKeys', ->
   it 'handles the noncurried case', ->
     testFn = (x) -> x[0].toUpperCase()
     assert.deepEqual (fp.zipKeys testFn, ['add', 'subtract']), {add:'A', subtract:'S'}
+
+
+describe.only 'pipe wrapper', ->
+  fa = fp.pipeWrap (x="") -> x+"a"
+  fb = fp.pipeWrap (x="") -> x+"b"
+  fp = fp.pipeWrap (x="") -> promise x+"p"
+
+  describe 'in compiled mode', ->
+    
+    it 'handles promise-free case', ->
+      testFn = fb fa
+      assert.equal testFn("s"), "sab"
+    
+    it 'handles initial promise', (done) ->
+      testFn = fb fa fp
+      testFn("s").then (r) ->
+        assert.equal r, "spab"
+        done()
+
+    it 'handles middle promise', (done) ->
+      testFn = fa fp fb
+      testFn("s").then (r) ->
+        assert.equal r, "sbpa"
+        done()
+    
+    it 'handles final promise', (done) ->
+      testFn = fp fa fb
+      testFn("s").then (r) ->
+        assert.equal r, "sbap"
+        done()
+
+
+  describe 'in direct mode', ->
+    
+    it 'handles promise-free case', ->
+      assert.equal (fb fa "s"), "sab"
+    
+    it 'handles initial promise', (done) ->
+      (fb fa fp "s").then (r) ->
+        assert.equal r, "spab"
+        done()
+
+    it 'handles middle promise', (done) ->
+      (fa fp fb "s").then (r) ->
+        assert.equal r, "sbpa"
+        done()
+    
+    it 'handles final promise', (done) ->
+      (fp fa fb "s").then (r) ->
+        assert.equal r, "sbap"
+        done()
+    
+
 
 
 describe 'natural piping', ->
