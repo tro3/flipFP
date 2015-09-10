@@ -562,8 +562,30 @@ describe 'qCompose', ->
     testFn = fp.qCompose fn3, fn2, fn1
     testFn(3,1).then (val) ->      
       assert.deepEqual val, 4
-  
-  
+
+
+describe 'qFilter', ->
+  it 'handles basic case', ->
+    testFn = fp.qFilter (x) -> promise x < 5
+    testFn [1,6,4,8,2]
+    .then (v) -> assert.deepEqual v, [1,4,2]  
+
+  it 'handles direct case', ->
+    fp.qFilter ((x) -> promise x < 5), [1,6,4,8,2]
+    .then (v) -> assert.deepEqual v, [1,4,2]  
+
+  it 'handles piped case', ->
+    f = () -> [1,6,4,8,2]
+    testFn = fp.qFilter ((x) -> promise(x < 5)), f
+    testFn()
+    .then (v) -> assert.deepEqual v, [1,4,2]  
+
+  it 'handles promise case', ->
+    f = () -> promise [1,6,4,8,2]
+    testFn = fp.qFilter ((x) -> promise(x < 5)), f
+    testFn()
+    .then (v) -> assert.deepEqual v, [1,4,2]  
+
 
 describe 'qPipe', ->
   it 'handles direct case', (done) ->

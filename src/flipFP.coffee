@@ -1,4 +1,4 @@
-
+Q = require 'q'
 x = module.exports
 p = console.log
 
@@ -516,27 +516,6 @@ x.zipKeys = zipKeys = genWrap _zipKeys
 
 
 #
-#**maybeqQPipeDirect** => (* -> *) -> (* -> *) or a
-#
-# Returns the executed original function if passed a value
-# as an argument.  If passed a function, it will
-# be piped to the original function.  Only works for
-# single-argument functions
-#
-x.maybeQPipeDirect = maybeQPipeDirect = (fcn) ->
-  (val) ->
-    if typeof val == 'function'
-      if val.length == 1
-        pipeWrap () ->
-          fcn.apply(null, arguments)
-          .then (x) -> val(x)
-      else
-        () -> fcn(val.apply(null,arguments))
-    else
-      fcn(val)
-      
-
-#
 #**qCompose** => [(a -> Q a)] -> (a -> Q a)
 #
 # Can't be genWrap'd due to unknown arg count
@@ -553,6 +532,19 @@ x.qCompose = qCompose = ->
   for fcn in fcns[1..]
     q = _qPipe(q, fcn)
   q
+
+
+#
+#**qFilter** => (a -> Q Boolean) -> ([] -> Q [])
+#
+_qFilter = (fcn) ->
+  (lst) ->
+    qs = []
+    r = []
+    [0...lst.length].forEach (i) ->
+      qs.push fcn(lst[i]).then((b) -> r[i] = b)
+    Q.all(qs).then -> _filterIndex((b,i)->r[i])(lst)
+x.qFilter = qFilter = genWrap _qFilter
 
 
 
