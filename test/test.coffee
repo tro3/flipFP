@@ -587,6 +587,29 @@ describe 'qFilter', ->
     .then (v) -> assert.deepEqual v, [1,4,2]  
 
 
+describe 'qMap', ->
+  it 'handles basic case', ->
+    testFn = fp.qMap (x) -> promise x + 1
+    testFn [1,6,4]
+    .then (v) -> assert.deepEqual v, [2,7,5]  
+
+  it 'handles direct case', ->
+    fp.qMap ((x) -> promise x + 1), [1,6,4]
+    .then (v) -> assert.deepEqual v, [2,7,5]  
+
+  it 'handles piped case', ->
+    f = () -> [1,6,4]
+    testFn = fp.qMap ((x) -> promise(x + 1)), f
+    testFn()
+    .then (v) -> assert.deepEqual v, [2,7,5]  
+
+  it 'handles promise case', ->
+    f = () -> promise [1,6,4]
+    testFn = fp.qMap ((x) -> promise(x + 1)), f
+    testFn()
+    .then (v) -> assert.deepEqual v, [2,7,5]  
+
+
 describe 'qPipe', ->
   it 'handles direct case', (done) ->
     fn1 = (x, y) ->  promise(x+2+y)

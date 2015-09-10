@@ -535,7 +535,7 @@ x.qCompose = qCompose = ->
 
 
 #
-#**qFilter** => (a -> Q Boolean) -> ([] -> Q [])
+#**qFilter** => (a -> Q Boolean) -> ([a] -> Q [])
 #
 _qFilter = (fcn) ->
   (lst) ->
@@ -546,6 +546,18 @@ _qFilter = (fcn) ->
     Q.all(qs).then -> _filterIndex((b,i)->r[i])(lst)
 x.qFilter = qFilter = genWrap _qFilter
 
+
+#
+#**qMap** => (a -> Q a) -> ([a] -> Q [a])
+#
+_qMap = (fcn) ->
+  (lst) ->
+    qs = []
+    r = []
+    [0...lst.length].forEach (i) ->
+      qs.push fcn(lst[i]).then((v) -> r[i] = v)
+    Q.all(qs).then -> r
+x.qMap = qMap = genWrap _qMap
 
 
 #
