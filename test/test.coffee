@@ -323,10 +323,6 @@ describe 'reduce', ->
     testFn = fp.reduce ((acc, val) -> acc+val), 0
     assert.equal testFn([1,2,3]), 6
 
-  it 'handles variable init case', ->
-    testFn = fp.reduce ((acc, val) -> acc+val)
-    assert.equal testFn(1, [1,2,3]), 7
-
 
 describe 'splitAt', ->
   it 'handles basic case', ->
@@ -335,6 +331,27 @@ describe 'splitAt', ->
 
   it 'handles noncurried case', ->
     assert.deepEqual fp.splitAt(1, [1,2,3]), [[1],[2,3]]
+
+
+describe 'splitWhile', ->
+  it 'handles basic case', ->
+    testFn = fp.splitWhile (x) -> (x < 2)
+    assert.deepEqual testFn([1,2,3]), [[1],[2,3]]
+
+  it 'handles direct case', ->
+    testFn = (x) -> (x < 2)
+    assert.deepEqual fp.splitWhile(testFn, [1,2,3]), [[1],[2,3]]
+
+  it 'handles piped case', ->
+    f = () -> [1,2,3]
+    testFn = fp.splitWhile ((x) -> x < 2), f
+    assert.deepEqual testFn(), [[1],[2,3]]
+
+  it 'handles promise case', ->
+    f = () -> promise [1,2,3]
+    testFn = fp.splitWhile ((x) -> x < 2), f
+    testFn f()
+    .then (val) -> assert.deepEqual val, [[1],[2,3]]
 
 
 describe 'splitHead', ->
@@ -529,22 +546,6 @@ describe 'natural q piping', ->
       assert.deepEqual vals, [6,7]
       done()
     #p 'done compiling'
-
-
-#describe 'natural q piping', ->
-#  it 'handles direct double pipe', (done) ->
-#    add1 = fp.maybeQPipeDirect (x) -> promise(x + 1)
-#    add2 = add1 add1
-#    add4 = add2 add2
-#    add1(1)
-#    .then (val) -> assert.equal val, 2
-#    .then -> add2(1)
-#    .then (val) -> assert.equal val, 3
-#    .then -> add4(1)
-#    .then (val) -> assert.equal val, 5
-#    .then -> done()
-#    .catch (err) -> done(err)
-
 
 
 describe 'qCompose', ->

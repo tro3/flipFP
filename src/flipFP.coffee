@@ -388,19 +388,12 @@ x.prop = prop = genWrap _prop
 #
 #**reduce** => (b,a -> b) -> b -> ([a] -> b)
 #
-x.reduce = reduce = () ->
-  _reduce = (fcn, init, lst) ->
+x.reduce = reduce = (fcn, init) ->
+  (lst) ->
     acc = init
     for val in lst
       acc = fcn(acc, val)
     acc
-
-  fcn = arguments[0]
-  if arguments.length > 1
-    init = arguments[1]
-    (lst) -> _reduce(fcn, init, lst)
-  else
-    (init, lst) -> _reduce(fcn, init, lst)
 
 
 #
@@ -414,6 +407,21 @@ _splitAt = (n) ->
       if i < n then r1.push lst[i] else r2.push lst[i]
     [r1,r2]
 x.splitAt = splitAt = genWrap _splitAt
+
+
+#
+#**splitWhile** => (a -> Boolean) -> ([a] -> [[a],[a]])
+#
+_splitWhile = (fcn) ->
+  (lst) ->
+    r1 = []
+    r2 = []
+    s = true
+    for item in lst
+      s = s and fcn(item)
+      if s then r1.push item else r2.push item
+    [r1,r2]
+x.splitWhile = splitWhile = genWrap _splitWhile
 
 
 #
