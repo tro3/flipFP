@@ -198,6 +198,38 @@ describe 'filterIndex', ->
     assert.deepEqual (fp.filterIndex testFn, [2.0,2.1,2.2,2.3,2.4]), [2.3,2.4]
 
 
+describe 'find', ->
+  data = [
+    {_id:1, data:1}
+    {_id:2, data:2}
+    {_id:3, data:2}
+    {_id:4, data:4}
+  ]
+    
+  it 'handles basic case', ->
+    testFn = fp.find {_id: 3}
+    assert.deepEqual (testFn data), {_id:3, data:2}
+
+  it 'handles duplicate case', ->
+    testFn = fp.find {data: 2}
+    assert.deepEqual (testFn data), {_id:2, data:2}
+
+  it 'handles direct case', ->
+    testFn = (x, d) -> fp.find {_id: x}, d
+    assert.deepEqual (testFn 4, data), {_id:4, data:4}
+
+  it 'handles piped case', ->
+    f = () -> data
+    testFn = fp.find {_id: 3}, f
+    assert.deepEqual testFn(), {_id:3, data:2}
+
+  it 'handles promised case', ->
+    f = () -> promise data
+    testFn = fp.find {_id: 3}, f
+    testFn()
+    .then (val) -> assert.deepEqual val, {_id:3, data:2}
+
+
 describe 'flatten', ->
   it 'handles basic case', ->
     assert.deepEqual fp.flatten([[1,2],[3,4]]), [1,2,3,4]

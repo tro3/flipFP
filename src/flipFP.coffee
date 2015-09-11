@@ -219,6 +219,19 @@ x.drop = drop = genWrap _drop
 
 
 #
+#**find** => {} -> ([] -> {})
+#
+_find = (spec) ->
+  (lst) ->
+    for item in lst
+      s = true
+      for k,v of spec
+        s = false if item[k] != v
+      return item if s 
+x.find = find = genWrap _find
+
+
+#
 #**filter** => (a -> Boolean) -> ([] -> [])
 #
 _filter = (fcn) ->
