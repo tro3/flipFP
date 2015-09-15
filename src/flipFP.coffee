@@ -232,6 +232,21 @@ x.find = find = genWrap _find
 
 
 #
+#**findAll** => {} -> ([] -> {})
+#
+_findAll = (spec) ->
+  (lst) ->
+    r = []
+    for item in lst
+      s = true
+      for k,v of spec
+        s = false if item[k] != v
+      r.push item if s
+    r
+x.findAll = findAll = genWrap _findAll
+
+
+#
 #**filter** => (a -> Boolean) -> ([] -> [])
 #
 _filter = (fcn) ->

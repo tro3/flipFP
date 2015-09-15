@@ -387,6 +387,52 @@ x.drop = drop = genWrap _drop</pre></div></div>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
+              <p><strong>find</strong> =&gt; {} -&gt; ([] -&gt; {})</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_find</span> = <span class="hljs-params">(spec)</span> -&gt;</span>
+  (lst) -&gt;
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
+      s = <span class="hljs-literal">true</span>
+      <span class="hljs-keyword">for</span> k,v <span class="hljs-keyword">of</span> spec
+        s = <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> item[k] != v
+      <span class="hljs-keyword">return</span> item <span class="hljs-keyword">if</span> s 
+x.find = find = genWrap _find</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p><strong>findAll</strong> =&gt; {} -&gt; ([] -&gt; {})</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_findAll</span> = <span class="hljs-params">(spec)</span> -&gt;</span>
+  (lst) -&gt;
+    r = []
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
+      s = <span class="hljs-literal">true</span>
+      <span class="hljs-keyword">for</span> k,v <span class="hljs-keyword">of</span> spec
+        s = <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> item[k] != v
+      r.push item <span class="hljs-keyword">if</span> s
+    r
+x.findAll = findAll = genWrap _findAll</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
               <p><strong>filter</strong> =&gt; (a -&gt; Boolean) -&gt; ([] -&gt; [])</p>
 
             </div>
@@ -402,11 +448,11 @@ x.filter = filter = genWrap _filter</pre></div></div>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p><strong>filterIndex</strong> =&gt; (a,i -&gt; Boolean) -&gt; ([] -&gt; [])</p>
 
@@ -423,11 +469,11 @@ x.filterIndex = filterIndex = genWrap _filterIndex</pre></div></div>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p><strong>flatten</strong> =&gt; [[]] -&gt; []</p>
 
@@ -446,11 +492,11 @@ x.flatten = flatten = pipeWrap _flatten</pre></div></div>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p><strong>id</strong> =&gt; a -&gt; a</p>
 
@@ -461,11 +507,11 @@ x.flatten = flatten = pipeWrap _flatten</pre></div></div>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p><strong>init</strong> =&gt; [] -&gt; []</p>
 
@@ -481,11 +527,11 @@ x.init = init = genWrap _init</pre></div></div>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p><strong>isNothing</strong> =&gt; a -&gt; Boolean</p>
 
@@ -501,11 +547,11 @@ x.isNothing = isNothing = pipeWrap _isNothing</pre></div></div>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p><strong>keys</strong> =&gt; ({} -&gt; [String])</p>
 
@@ -517,11 +563,11 @@ x.keys = keys = pipeWrap _keys</pre></div></div>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p><strong>map</strong> =&gt; (a -&gt; a) -&gt; ([a] -&gt; [a])</p>
 
@@ -538,11 +584,11 @@ x.map = map = genWrap _map</pre></div></div>
         </li>
         
         
-        <li id="section-26">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p><strong>mapIndex</strong> =&gt; (a,Int -&gt; a) -&gt; ([a] -&gt; [a])</p>
 
@@ -559,11 +605,11 @@ x.mapIndex = mapIndex = genWrap _mapIndex</pre></div></div>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p><strong>mapKeys</strong> =&gt; (String -&gt; a) -&gt; ([String] -&gt; {})</p>
 
@@ -580,11 +626,11 @@ x.mapKeys = mapKeys = genWrap _mapKeys</pre></div></div>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p><strong>mapObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {})</p>
 
@@ -601,11 +647,11 @@ x.mapObj = mapObj = genWrap _mapObj</pre></div></div>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p><strong>merge</strong> =&gt; {} -&gt; ({} -&gt; {})</p>
 
@@ -615,10 +661,8 @@ x.mapObj = mapObj = genWrap _mapObj</pre></div></div>
 <span class="hljs-function">  <span class="hljs-title">_merge</span> = <span class="hljs-params">(old)</span> -&gt;</span>
 <span class="hljs-function">    <span class="hljs-title">loopFn</span> = <span class="hljs-params">(o, n)</span> -&gt;</span>
       <span class="hljs-keyword">return</span> o <span class="hljs-keyword">if</span> n == <span class="hljs-literal">undefined</span>
-      <span class="hljs-keyword">if</span> n <span class="hljs-keyword">instanceof</span> Array
-        <span class="hljs-keyword">if</span> o <span class="hljs-keyword">instanceof</span> Array <span class="hljs-keyword">then</span> loopOverList o, n
-        <span class="hljs-keyword">else</span> n
-      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> n == <span class="hljs-string">'object'</span>
+      <span class="hljs-keyword">return</span> n <span class="hljs-keyword">if</span> n <span class="hljs-keyword">instanceof</span> Array
+      <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> n == <span class="hljs-string">'object'</span>
         <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> o == <span class="hljs-string">'object'</span> <span class="hljs-keyword">then</span> loopOverObj o, n
       <span class="hljs-keyword">else</span> n    
 <span class="hljs-function">    <span class="hljs-title">loopOverList</span> = <span class="hljs-params">(o,n)</span> -&gt;</span> (loopFn(o[i],n[i]) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..n.length])  
@@ -632,11 +676,11 @@ x.mapObj = mapObj = genWrap _mapObj</pre></div></div>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p><strong>pipe</strong> =&gt; [(a -&gt; a)] -&gt; (a -&gt; a)</p>
 <p>Can’t be genWrap’d due to unknown arg count</p>
@@ -656,11 +700,11 @@ x.mapObj = mapObj = genWrap _mapObj</pre></div></div>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p><strong>prop</strong> =&gt; String -&gt; ({} -&gt; a)</p>
 
@@ -672,38 +716,31 @@ x.prop = prop = genWrap _prop</pre></div></div>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p><strong>reduce</strong> =&gt; (b,a -&gt; b) -&gt; b -&gt; ([a] -&gt; b)</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>x.reduce = reduce = <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
-<span class="hljs-function">  <span class="hljs-title">_reduce</span> = <span class="hljs-params">(fcn, init, lst)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>x.reduce = reduce = <span class="hljs-function"><span class="hljs-params">(fcn, init)</span> -&gt;</span>
+  (lst) -&gt;
     acc = init
     <span class="hljs-keyword">for</span> val <span class="hljs-keyword">in</span> lst
       acc = fcn(acc, val)
-    acc
-
-  fcn = arguments[<span class="hljs-number">0</span>]
-  <span class="hljs-keyword">if</span> arguments.length &gt; <span class="hljs-number">1</span>
-    init = arguments[<span class="hljs-number">1</span>]
-    (lst) -&gt; _reduce(fcn, init, lst)
-  <span class="hljs-keyword">else</span>
-    (init, lst) -&gt; _reduce(fcn, init, lst)</pre></div></div>
+    acc</pre></div></div>
             
         </li>
         
         
-        <li id="section-33">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p><strong>splitAt</strong> =&gt; Int -&gt; ([] -&gt; [[],[]])</p>
 
@@ -721,11 +758,35 @@ x.splitAt = splitAt = genWrap _splitAt</pre></div></div>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p><strong>splitWhile</strong> =&gt; (a -&gt; Boolean) -&gt; ([a] -&gt; [[a],[a]])</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_splitWhile</span> = <span class="hljs-params">(fcn)</span> -&gt;</span>
+  (lst) -&gt;
+    r1 = []
+    r2 = []
+    s = <span class="hljs-literal">true</span>
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> lst
+      s = s <span class="hljs-keyword">and</span> fcn(item)
+      <span class="hljs-keyword">if</span> s <span class="hljs-keyword">then</span> r1.push item <span class="hljs-keyword">else</span> r2.push item
+    [r1,r2]
+x.splitWhile = splitWhile = genWrap _splitWhile</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p><strong>splitHead</strong> =&gt; [a] -&gt; [a,[]]</p>
 
@@ -737,11 +798,11 @@ x.splitHead = splitHead = pipeWrap _splitHead</pre></div></div>
         </li>
         
         
-        <li id="section-35">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p><strong>splitLast</strong> =&gt; [a] -&gt; [[],a]</p>
 
@@ -753,11 +814,11 @@ x.splitLast = splitLast = pipeWrap _splitHead</pre></div></div>
         </li>
         
         
-        <li id="section-36">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p><strong>tail</strong> =&gt; [] -&gt; []</p>
 
@@ -773,11 +834,11 @@ x.tail = tail = pipeWrap _tail</pre></div></div>
         </li>
         
         
-        <li id="section-37">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p><strong>take</strong> =&gt; Int -&gt; ([] -&gt; {})</p>
 
@@ -794,11 +855,11 @@ x.take = take = genWrap _take</pre></div></div>
         </li>
         
         
-        <li id="section-38">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <p><strong>traverseObj</strong> =&gt; (a -&gt; a) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {}) -&gt; ({} -&gt; {})</p>
 <p>The first object function is executed before descending, the second operates
@@ -824,11 +885,11 @@ on the object resulting after descending</p>
         </li>
         
         
-        <li id="section-39">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p><strong>union</strong> =&gt; [] -&gt; ([] -&gt; [])</p>
 
@@ -845,11 +906,11 @@ x.union = union = genWrap _union</pre></div></div>
         </li>
         
         
-        <li id="section-40">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <p><strong>zipObj</strong> =&gt; [] -&gt; ([] -&gt; {})</p>
 
@@ -866,11 +927,11 @@ x.zipObj = zipObj = genWrap _zip</pre></div></div>
         </li>
         
         
-        <li id="section-41">
+        <li id="section-44">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
               <p><strong>zipKeys</strong> =&gt; (String -&gt; a) -&gt; ([String] -&gt; {})</p>
 
@@ -887,11 +948,11 @@ x.zipKeys = zipKeys = genWrap _zipKeys</pre></div></div>
         </li>
         
         
-        <li id="section-42">
+        <li id="section-45">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
               <h2 id="q-functions">Q Functions</h2>
 <p> Functions that operate on promises</p>
@@ -901,11 +962,11 @@ x.zipKeys = zipKeys = genWrap _zipKeys</pre></div></div>
         </li>
         
         
-        <li id="section-43">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p><strong>qCompose</strong> =&gt; [(a -&gt; Q a)] -&gt; (a -&gt; Q a)</p>
 <p>Can’t be genWrap’d due to unknown arg count</p>
@@ -928,13 +989,13 @@ x.zipKeys = zipKeys = genWrap _zipKeys</pre></div></div>
         </li>
         
         
-        <li id="section-44">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
-              <p><strong>qFilter</strong> =&gt; (a -&gt; Q Boolean) -&gt; ([] -&gt; Q [])</p>
+              <p><strong>qFilter</strong> =&gt; (a -&gt; Q Boolean) -&gt; ([a] -&gt; Q [])</p>
 
             </div>
             
@@ -950,11 +1011,33 @@ x.qFilter = qFilter = genWrap _qFilter</pre></div></div>
         </li>
         
         
-        <li id="section-45">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
+              </div>
+              <p><strong>qMap</strong> =&gt; (a -&gt; Q a) -&gt; ([a] -&gt; Q [a])</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_qMap</span> = <span class="hljs-params">(fcn)</span> -&gt;</span>
+  (lst) -&gt;
+    qs = []
+    r = []
+    [<span class="hljs-number">0.</span>..lst.length].forEach (i) -&gt;
+      qs.push fcn(lst[i]).<span class="hljs-keyword">then</span>(<span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span> r[i] = v)
+    Q.all(qs).<span class="hljs-keyword">then</span> -&gt; r
+x.qMap = qMap = genWrap _qMap</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-49">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p><strong>qPipe</strong> =&gt; [(a -&gt; Q a)] -&gt; (a -&gt; Q a)</p>
 <p>Can’t be genWrap’d due to unknown arg count</p>
@@ -981,11 +1064,11 @@ defers.forEach (fcn) -&gt; fcn()</pre></div></div>
         </li>
         
         
-        <li id="section-46">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <p>Speed testing</p>
 
@@ -994,11 +1077,11 @@ defers.forEach (fcn) -&gt; fcn()</pre></div></div>
         </li>
         
         
-        <li id="section-47">
+        <li id="section-51">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
               <p>_splitLast = (n) -&gt; (lst) -&gt; [(lst[i] for i in [0…n-1]), lst[n-1]]
 _apply = (f, args, x) -&gt; xs = (args[i] for i in [0…args.length]); xs.push x; f.apply(null, xs)
