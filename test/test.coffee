@@ -317,13 +317,15 @@ describe 'merge', ->
     assert.deepEqual testFn(1), {a:2,b:2,c:1}
 
   it 'handles direct case', ->
-    testFn = fp.merge {a:1, b:2}
     assert.deepEqual fp.merge({a:1, b:2},{a:2,c:1}), {a:2,b:2,c:1}
 
   it 'handles promised case', ->
     testFn = fp.merge {a:1, b:2}
     testFn(promise {a:2,c:1})
     .then (v) -> assert.deepEqual v, {a:2,b:2,c:1}
+
+  it 'handles lists of objects', ->
+    assert.deepEqual fp.merge({a:1, b:[{c:1}], d:1},{a:2,b:[{c:2},{c:3}]}), {a:2,b:[{c:2},{c:3}], d:1}
 
 
 

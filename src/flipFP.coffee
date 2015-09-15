@@ -360,10 +360,8 @@ defers.push ->
   _merge = (old) ->
     loopFn = (o, n) ->
       return o if n == undefined
-      if n instanceof Array
-        if o instanceof Array then loopOverList o, n
-        else n
-      else if typeof n == 'object'
+      return n if n instanceof Array
+      if typeof n == 'object'
         if typeof o == 'object' then loopOverObj o, n
       else n    
     loopOverList = (o,n) -> (loopFn(o[i],n[i]) for i in [0...n.length])  
