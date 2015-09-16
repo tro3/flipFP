@@ -338,6 +338,22 @@ describe 'mapObj', ->
     assert.deepEqual (fn {a:1, b:1}), {a:2, b:2}
 
 
+describe 'max', ->
+  it 'handles basic case', ->
+    assert.equal (fp.max [1,2,3,2,1]), 3
+
+  it 'handles piped case', ->
+    f1 = -> [1,2,3,2,1]
+    f2 = fp.max f1
+    assert.equal f2(), 3
+
+  it 'handles promise case', (done) ->
+    f1 = -> promise [1,2,3,2,1]
+    f2 = fp.max f1
+    f2()
+    .then (v) -> assert.equal v, 3; done()
+
+
 describe 'merge', ->
   it 'handles basic case', ->
     testFn = fp.merge {a:1, b:2}
@@ -697,5 +713,14 @@ describe 'qPipe', ->
       
     testFn = fp.qPipe fn1, fn2, fn3
     testFn(3,1).then (val) ->      
+      assert.deepEqual val, 4
+      done()
+
+  it 'handles mixed case', (done) ->
+    fn1 = (x, y) ->  promise(x+2+y)
+    fn2 = (x) ->     x/2
+    fn3 = (x) ->     promise(x+1)
+      
+    (fp.qPipe fn1, fn2, fn3)(3,1).then (val) ->
       assert.deepEqual val, 4
       done()

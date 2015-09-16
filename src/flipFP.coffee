@@ -368,6 +368,13 @@ x.mapObj = mapObj = genWrap _mapObj
 
 
 #
+#**max** => [a] -> a
+#
+_max = (lst) -> p lst; Math.max.apply(null, lst)
+x.max = max = pipeWrap _max
+
+
+#
 #**merge** => {} -> ({} -> {})
 #
 #
