@@ -373,13 +373,13 @@ x.mapObj = mapObj = genWrap _mapObj
 #
 defers.push ->
   _merge = (old) ->
-    loopFn = (o, n) ->
+    loopFn = (o,n) ->
       return o if n == undefined
       return n if n instanceof Array
-      if typeof n == 'object'
-        if typeof o == 'object' then loopOverObj o, n
+      return n if n == null or o == null
+      if typeof(n) == typeof(o) == 'object'
+        loopOverObj(o,n) 
       else n    
-    loopOverList = (o,n) -> (loopFn(o[i],n[i]) for i in [0...n.length])  
     loopOverObj = (o,n) -> _mapKeys((k) -> loopFn(o[k],n[k]))(_union(_keys o)(_keys n))
 
     (new_) ->

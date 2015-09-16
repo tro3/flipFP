@@ -659,13 +659,13 @@ x.mapObj = mapObj = genWrap _mapObj</pre></div></div>
             
             <div class="content"><div class='highlight'><pre>defers.push -&gt;
 <span class="hljs-function">  <span class="hljs-title">_merge</span> = <span class="hljs-params">(old)</span> -&gt;</span>
-<span class="hljs-function">    <span class="hljs-title">loopFn</span> = <span class="hljs-params">(o, n)</span> -&gt;</span>
+<span class="hljs-function">    <span class="hljs-title">loopFn</span> = <span class="hljs-params">(o,n)</span> -&gt;</span>
       <span class="hljs-keyword">return</span> o <span class="hljs-keyword">if</span> n == <span class="hljs-literal">undefined</span>
       <span class="hljs-keyword">return</span> n <span class="hljs-keyword">if</span> n <span class="hljs-keyword">instanceof</span> Array
-      <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> n == <span class="hljs-string">'object'</span>
-        <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> o == <span class="hljs-string">'object'</span> <span class="hljs-keyword">then</span> loopOverObj o, n
+      <span class="hljs-keyword">return</span> n <span class="hljs-keyword">if</span> n == <span class="hljs-literal">null</span> <span class="hljs-keyword">or</span> o == <span class="hljs-literal">null</span>
+      <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span>(n) == <span class="hljs-keyword">typeof</span>(o) == <span class="hljs-string">'object'</span>
+        loopOverObj(o,n) 
       <span class="hljs-keyword">else</span> n    
-<span class="hljs-function">    <span class="hljs-title">loopOverList</span> = <span class="hljs-params">(o,n)</span> -&gt;</span> (loopFn(o[i],n[i]) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..n.length])  
 <span class="hljs-function">    <span class="hljs-title">loopOverObj</span> = <span class="hljs-params">(o,n)</span> -&gt;</span> _mapKeys(<span class="hljs-function"><span class="hljs-params">(k)</span> -&gt;</span> loopFn(o[k],n[k]))(_union(_keys o)(_keys n))
 
     (new_) -&gt;

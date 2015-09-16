@@ -359,6 +359,9 @@ describe 'merge', ->
   it 'handles lists of objects', ->
     assert.deepEqual fp.merge({a:1, b:[{c:1}], d:1},{a:2,b:[{c:2},{c:3}]}), {a:2,b:[{c:2},{c:3}], d:1}
 
+  it 'handles null values', ->
+    testFn = fp.merge {a:1, b:null, d:null}
+    assert.deepEqual testFn({a:2,c:null,d:null}), {a:2,b:null,c:null,d:null}
 
 
 describe 'pipe', ->
