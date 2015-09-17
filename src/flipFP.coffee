@@ -207,6 +207,18 @@ defers.push ->
 
 
 #
+#**difference** => [] -> ([] -> {})
+#
+_difference = (lstA) ->
+  (lstB) ->
+    r = []
+    for item in lstA
+      r.push item if item not in lstB
+    r
+x.difference = difference = genWrap _difference
+
+
+#
 #**drop** => Int -> ([] -> {})
 #
 _drop = (n) ->

@@ -178,6 +178,25 @@ describe 'concat', ->
     assert.deepEqual fp.concat(1, [2,3], 4), [1,2,3,4]
 
 
+describe 'difference', ->
+  it 'handles basic cases', ->
+    testFn = fp.difference [1,2,3,4]
+    assert.deepEqual (testFn [3,1,5]), [2,4]
+
+  it 'handles piped cases', ->
+    f = -> [3,1,5]
+    testFn = fp.difference [1,2,3,4], f
+    assert.deepEqual testFn(), [2,4]
+
+  it 'handles direct cases', ->
+    assert.deepEqual (fp.difference [1,2,3,4], [3,1,5]), [2,4]
+
+  it 'handles promise cases', ->
+    testFn = fp.difference [1,2,3,4]
+    testFn promise [3,1,5]
+    .then (v) -> assert.deepEqual v, [2,4]
+
+
 describe 'filter', ->
   it 'handles basic case', ->
     testFn = fp.filter (x) -> x < 5
