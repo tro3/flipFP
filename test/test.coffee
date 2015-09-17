@@ -249,6 +249,38 @@ describe 'find', ->
     .then (val) -> assert.deepEqual val, {_id:3, data:2}
 
 
+describe 'findIndex', ->
+  data = [
+    {_id:1, data:1}
+    {_id:2, data:2}
+    {_id:3, data:2}
+    {_id:4, data:4}
+  ]
+    
+  it 'handles basic case', ->
+    testFn = fp.findIndex {_id: 3}
+    assert.deepEqual (testFn data), 2
+
+  it 'handles duplicate case', ->
+    testFn = fp.findIndex {data: 2}
+    assert.deepEqual (testFn data), 1
+
+  it 'handles direct case', ->
+    testFn = (x, d) -> fp.findIndex {_id: x}, d
+    assert.deepEqual (testFn 4, data), 3
+
+  it 'handles piped case', ->
+    f = () -> data
+    testFn = fp.findIndex {_id: 3}, f
+    assert.deepEqual testFn(), 2
+
+  it 'handles promised case', ->
+    f = () -> promise data
+    testFn = fp.findIndex {_id: 3}, f
+    testFn()
+    .then (val) -> assert.deepEqual val, 2
+
+
 describe 'findAll', ->
   data = [
     {_id:1, data:1}

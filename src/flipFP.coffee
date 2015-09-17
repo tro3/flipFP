@@ -244,6 +244,20 @@ x.find = find = genWrap _find
 
 
 #
+#**find** => {} -> ([] -> {})
+#
+_findIndex = (spec) ->
+  (lst) ->
+    for i in [0...lst.length]
+      s = true
+      item = lst[i]
+      for k,v of spec
+        s = false if item[k] != v
+      return i if s 
+x.findIndex = findIndex = genWrap _findIndex
+
+
+#
 #**findAll** => {} -> ([] -> {})
 #
 _findAll = (spec) ->
