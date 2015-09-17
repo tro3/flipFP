@@ -394,6 +394,25 @@ describe 'pipe', ->
     assert.deepEqual fn(3, 1), 3
 
 
+describe 'pluck', ->
+  it 'handles basic case', ->
+    testFn = fp.pluck 'a'
+    assert.deepEqual testFn([{a:2,b:1},{a:1,b:2}]), [2,1]
+
+  it 'handles piped case', ->
+    f = () -> [{a:2,b:1},{a:1,b:2}]
+    testFn = fp.pluck 'a', f
+    assert.deepEqual testFn(), [2,1]
+
+  it 'handles direct case', ->
+    assert.deepEqual fp.pluck('a', [{a:2,b:1},{a:1,b:2}]), [2,1]
+
+  it 'handles promised case', ->
+    testFn = fp.pluck 'a'
+    testFn(promise [{a:2,b:1},{a:1,b:2}])
+    .then (v) -> assert.deepEqual v, [2,1]
+
+
 describe 'prop', ->
   it 'handles basic case', ->
     testFn = fp.map fp.prop 'id'

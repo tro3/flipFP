@@ -412,6 +412,18 @@ x.pipe = pipe = ->
 
 
 #
+#**pluck** => String -> ([{}] -> [])
+#
+_pluck = (key) ->
+  (lst) ->
+    r = []
+    for item in lst
+      r.push item[key]
+    r
+x.pluck = pluck = genWrap _pluck
+
+
+#
 #**prop** => String -> ({} -> a)
 #
 _prop = (key) -> (obj) -> obj[key]
