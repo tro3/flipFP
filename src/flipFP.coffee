@@ -231,6 +231,19 @@ x.drop = drop = genWrap _drop
 
 
 #
+#**equal** => Int -> ([] -> {})
+#
+_equal = (obj1) ->
+  (obj2) ->
+    ks = _keys obj1
+    return false if _keys(obj2).length != ks.length
+    for k in ks
+      return false if obj1[k] != obj2[k]
+    true
+x.equal = equal = genWrap _equal
+
+
+#
 #**find** => {} -> ([] -> {})
 #
 _find = (spec) ->

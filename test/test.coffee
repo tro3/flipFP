@@ -197,6 +197,33 @@ describe 'difference', ->
     .then (v) -> assert.deepEqual v, [2,4]
 
 
+describe 'equal', ->
+  it 'handles basic cases', ->
+    testFn = fp.equal [1,2,3,4]
+    assert.isFalse (testFn [3,1,5])
+    assert.isTrue (testFn [1,2,3,4])
+
+  it 'handles piped cases', ->
+    f = (x) -> [1,2,3,x]
+    testFn = fp.equal [1,2,3,4], f
+    assert.isFalse testFn(1)
+    assert.isTrue testFn(4)
+
+  it 'handles direct cases', ->
+    assert.isFalse (fp.equal [1,2,3,4], [3,1,5])
+    assert.isTrue (fp.equal [1,2,3,4], [1,2,3,4])
+
+  it 'handles promise cases', ->
+    testFn = fp.equal [1,2,3,4]
+    testFn(promise [3,1,5]).then (v) -> assert.isFalse v
+    testFn(promise [1,2,3,4]).then (v) -> assert.isTrue v
+
+  it 'handles object cases', ->
+    testFn = fp.equal {a:1, b:2}
+    assert.isFalse (testFn {a:1, c:2})
+    assert.isTrue (testFn {a:1, b:2})
+
+
 describe 'filter', ->
   it 'handles basic case', ->
     testFn = fp.filter (x) -> x < 5
