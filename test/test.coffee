@@ -353,6 +353,9 @@ describe 'max', ->
     f2()
     .then (v) -> assert.equal v, 3; done()
 
+  it 'handles undefined case', ->
+    assert.equal (fp.max [-1,-2,-3,undefined,-1]), -1
+
 
 describe 'merge', ->
   it 'handles basic case', ->
@@ -378,6 +381,25 @@ describe 'merge', ->
   it 'handles null values', ->
     testFn = fp.merge {a:1, b:null, d:null}
     assert.deepEqual testFn({a:2,c:null,d:null}), {a:2,b:null,c:null,d:null}
+
+
+describe 'min', ->
+  it 'handles basic case', ->
+    assert.equal (fp.min [1,2,3,2,1]), 1
+
+  it 'handles piped case', ->
+    f1 = -> [1,2,3,2,1]
+    f2 = fp.min f1
+    assert.equal f2(), 1
+
+  it 'handles promise case', (done) ->
+    f1 = -> promise [1,2,3,2,0]
+    f2 = fp.min f1
+    f2()
+    .then (v) -> assert.equal v, 0; done()
+
+  it 'handles undefined case', ->
+    assert.equal (fp.min [-1,-2,-3,undefined,-1]), -3
 
 
 describe 'pipe', ->

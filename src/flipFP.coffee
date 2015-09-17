@@ -370,7 +370,12 @@ x.mapObj = mapObj = genWrap _mapObj
 #
 #**max** => [a] -> a
 #
-_max = (lst) -> Math.max.apply(null, lst)
+_max = (lst) ->
+  r = lst[0]
+  for item in lst[1...lst.length]
+    if item != undefined and item > r
+      r = item
+  r
 x.max = max = pipeWrap _max
 
 
@@ -393,6 +398,18 @@ defers.push ->
       loopOverObj(old, new_)
       
   x.merge = merge = genWrap _merge
+
+
+#
+#**min** => [a] -> a
+#
+_min = (lst) ->
+  r = lst[0]
+  for item in lst[1...lst.length]
+    if item != undefined and item < r
+      r = item
+  r
+x.min = min = pipeWrap _min
   
 
 #
