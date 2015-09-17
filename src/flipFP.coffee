@@ -314,6 +314,18 @@ x.init = init = genWrap _init
 
 
 #
+#**intersection** => [] -> ([] -> {})
+#
+_intersection = (lstA) ->
+  (lstB) ->
+    r = []
+    for item in lstA
+      r.push item if item in lstB
+    r
+x.intersection = intersection = genWrap _intersection
+
+
+#
 #**isNothing** => a -> Boolean
 #
 _isNothing = (a) ->

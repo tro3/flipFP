@@ -305,6 +305,25 @@ describe 'id', ->
     assert.equal fp.id(val), val
 
 
+describe 'intersection', ->
+  it 'handles basic cases', ->
+    testFn = fp.intersection [1,2,3,4]
+    assert.deepEqual (testFn [3,1,5]), [1,3]
+
+  it 'handles piped cases', ->
+    f = -> [3,1,5]
+    testFn = fp.intersection [1,2,3,4], f
+    assert.deepEqual testFn(), [1,3]
+
+  it 'handles direct cases', ->
+    assert.deepEqual (fp.intersection [1,2,3,4], [3,1,5]), [1,3]
+
+  it 'handles promise cases', ->
+    testFn = fp.intersection [1,2,3,4]
+    testFn promise [3,1,5]
+    .then (v) -> assert.deepEqual v, [1,3]
+
+
 describe 'isNothing', ->
   it 'handles handles basic cases', ->
     assert.isTrue fp.isNothing(null), 'null'
