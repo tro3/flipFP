@@ -352,14 +352,25 @@ describe 'flatten', ->
     assert.deepEqual (fp.flatten testFn)(2,4), [2,4,4,6]
 
 
-describe 'keys', ->
-  it 'handles handles basic case', ->
-    val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
-    assert.sameMembers fp.keys(val), ['a','b','d','f']
+describe 'head', ->
+  it 'handles basic case', ->
+    lst = [1,3,5,7]
+    assert.equal fp.head(lst), 1
+
+  it 'handles piped case', ->
+    f = -> [1,3,5,7]
+    testFn = fp.head f
+    assert.equal testFn(), 1
+
+  it 'handles promise case', ->
+    f = -> promise [1,3,5,7]
+    testFn = fp.head f
+    testFn()
+    .then (v) -> assert.equal v, 1
 
 
 describe 'id', ->
-  it 'handles handles basic case', ->
+  it 'handles basic case', ->
     val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
     assert.equal fp.id(val), val
 
@@ -398,7 +409,29 @@ describe 'isNothing', ->
     testFn = fp.isNothing (x,y) -> if x == 1 then [] else [x+y]
     assert.isTrue testFn(1,2)
     assert.isFalse testFn(2,3)
+
     
+describe 'keys', ->
+  it 'handles handles basic case', ->
+    val = {a:1, b:{c:2}, d:[{e:3}], f:[4]}
+    assert.sameMembers fp.keys(val), ['a','b','d','f']
+
+
+describe 'last', ->
+  it 'handles basic case', ->
+    lst = [1,3,5,7]
+    assert.equal fp.last(lst), 7
+
+  it 'handles piped case', ->
+    f = -> [1,3,5,7]
+    testFn = fp.last f
+    assert.equal testFn(), 7
+
+  it 'handles promise case', ->
+    f = -> promise [1,3,5,7]
+    testFn = fp.last f
+    testFn()
+    .then (v) -> assert.equal v, 7
 
 
 describe 'map', ->

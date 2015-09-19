@@ -324,6 +324,13 @@ x.flatten = flatten = pipeWrap _flatten
 
 
 #
+#**head** => [] -> a
+#
+_head = (lst) -> lst[0]
+x.head = head = pipeWrap _head
+
+
+#
 #**id** => a -> a
 #
 x.id = id = (a) -> a
@@ -368,6 +375,13 @@ x.isNothing = isNothing = pipeWrap _isNothing
 #
 _keys = (a) -> Object.keys a
 x.keys = keys = pipeWrap _keys
+
+
+#
+#**last** => [] -> a
+#
+_last = (lst) -> lst[lst.length-1]
+x.last = last = pipeWrap _last
 
 
 #
