@@ -433,6 +433,18 @@ x.mapObj = mapObj = genWrap _mapObj
 
 
 #
+#**mapPairs** => ({k,v} -> a) -> ({} -> [a])
+#
+_mapPairs = (fcn) ->
+  (obj) ->
+    r = []
+    for k,v of obj
+      r.push fcn({key:k, val:v})
+    r
+x.mapPairs = mapPairs = genWrap _mapPairs
+
+
+#
 #**max** => [a] -> a
 #
 _max = (lst) ->

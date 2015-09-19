@@ -468,6 +468,29 @@ describe 'mapObj', ->
     assert.deepEqual (fn {a:1, b:1}), {a:2, b:2}
 
 
+describe 'mapPairs', ->
+  it 'handles basic case', ->
+    testFn = fp.mapPairs (p) -> {a:p.key, b:p.val}
+    assert.deepEqual (testFn {status: true, age:4}), [{a:'status',b:true},{a:'age',b:4}]
+
+  it 'handles direct case', ->
+    assert.deepEqual(
+      fp.mapPairs ((p) -> {a:p.key, b:p.val}), {status: true, age:4}
+      [{a:'status',b:true},{a:'age',b:4}]
+    )
+
+  it 'handles piped case', ->
+    f = -> {status: true, age:4}
+    testFn = fp.mapPairs ((p) -> {a:p.key, b:p.val}), f
+    assert.deepEqual testFn(), [{a:'status',b:true},{a:'age',b:4}]
+
+  it 'handles promised case', ->
+    f = -> promise {status: true, age:4}
+    testFn = fp.mapPairs ((p) -> {a:p.key, b:p.val}), f
+    testFn()
+    .then (v) -> assert.deepEqual v, [{a:'status',b:true},{a:'age',b:4}]
+
+
 describe 'max', ->
   it 'handles basic case', ->
     assert.equal (fp.max [1,2,3,2,1]), 3
